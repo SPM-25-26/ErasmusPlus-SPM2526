@@ -1,3 +1,5 @@
+using Eppoi.API.Interfaces;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -36,12 +38,15 @@ namespace Eppoi.API
                 builder.Host.UseSerilog();
 
                 builder.Services.AddControllers();
+                builder.Services.AddValidatorsFromAssemblyContaining<Program>();
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen();
 
                 builder.Services.AddDbContext<AppDbContext>(options =>
                     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+                builder.Services.AddScoped<IPasswordHasherService, BCryptPasswordHasherService>();
+                
                 var app = builder.Build();
 
                 if (app.Environment.IsDevelopment())
