@@ -1,4 +1,5 @@
-﻿using Eppoi.API.DTOs.Auth;
+﻿using Eppoi.API.DTOs;
+using Eppoi.API.DTOs.Auth;
 using Eppoi.API.Entities;
 using Eppoi.API.Interfaces;
 using FluentValidation;
@@ -13,22 +14,28 @@ namespace Eppoi.API.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IPasswordHasherService _passwordHasher;
-        private readonly IValidator<RegisterRequestDto> _validator;
+        private readonly ITokenService _tokenService;
+        private readonly IValidator<RegisterRequestDto> _registerValidator;
+        private readonly IValidator<LoginRequestDto> _loginValidator;
 
         public AuthController(
             AppDbContext context,
             IPasswordHasherService passwordHasher,
-            IValidator<RegisterRequestDto> validator)
+            ITokenService tokenService,
+            IValidator<RegisterRequestDto> registerValidator,
+            IValidator<LoginRequestDto> loginValidator)
         {
             _context = context;
             _passwordHasher = passwordHasher;
-            _validator = validator;
+            _tokenService = tokenService;
+            _registerValidator = registerValidator;
+            _loginValidator = loginValidator;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
-            var validationResult = await _validator.ValidateAsync(request);
+            var validationResult = await _registerValidator.ValidateAsync(request);
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.Errors.Select(e => new { e.PropertyName, e.ErrorMessage }));
 
@@ -61,6 +68,29 @@ namespace Eppoi.API.Controllers
             await _context.SaveChangesAsync();
 
             return StatusCode(StatusCodes.Status201Created, new { message = "User registered successfully." });
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+        {
+            var validationResult = await _loginValidator.ValidateAsync(request);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors.Select(e => new { e.PropertyName, e.ErrorMessage }));
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Mail == request.EmailOrUsername || u.Username == request.EmailOrUsername);
+
+            if (user == null || !_passwordHasher.VerifyPassword(request.Password, user.Password))
+                return Unauthorized(new { message = "Invalid credentials." });
+
+            var token = _tokenService.GenerateToken(user);
+
+            return Ok(new
+            {
+                message = "Login successful.",
+                token
+            });
         }
     }
 }
