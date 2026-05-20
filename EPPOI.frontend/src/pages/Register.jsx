@@ -1,18 +1,43 @@
 import React, { useState } from 'react';
-// 1. Aggiungiamo useNavigate tra le importazioni
 import { Link, useNavigate } from 'react-router-dom';
 
 function Register() {
   const [nome, setNome] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confermaPassword, setConfermaPassword] = useState('');
   const [errore, setErrore] = useState('');
 
-  // 2. Inizializziamo l'hook per la navigazione
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (nome.trim().length < 3) {
+      setErrore("Il nome deve contenere almeno 3 caratteri.");
+      return;
+    }
+
+    if (!username.trim()) {
+      setErrore("Inserisci uno username.");
+      return;
+    }
+
+    if (!email.trim()) {
+      setErrore("Inserisci la tua email.");
+      return;
+    }
+
+    if (!email.includes("@") || !email.includes(".")) {
+      setErrore("Inserisci un indirizzo email valido.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setErrore("La password deve contenere almeno 8 caratteri.");
+      return;
+    }
 
     const haMaiuscola = /[A-Z]/.test(password);
     const haNumero = /[0-9]/.test(password);
@@ -23,9 +48,12 @@ function Register() {
       return;
     }
 
+    if (password !== confermaPassword) {
+      setErrore("Le password non coincidono.");
+      return;
+    }
+
     setErrore('');
-    
-    // 3. Potiamo l'utente alla pagina di verifica email
     navigate('/verify-email');
   };
 
@@ -50,6 +78,17 @@ function Register() {
             required 
           />
         </div>
+
+        <div className="form-group">
+          <label>Username</label>
+          <input 
+            type="text" 
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="mariorossi" 
+            required 
+          />
+        </div>
         
         <div className="form-group">
           <label>Email</label>
@@ -68,6 +107,17 @@ function Register() {
             type="password" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••" 
+            required 
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Conferma Password</label>
+          <input 
+            type="password" 
+            value={confermaPassword}
+            onChange={(e) => setConfermaPassword(e.target.value)}
             placeholder="••••••••" 
             required 
           />
