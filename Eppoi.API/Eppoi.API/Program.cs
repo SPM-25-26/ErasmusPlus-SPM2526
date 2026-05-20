@@ -19,6 +19,7 @@ namespace Eppoi.API
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
                 .WriteTo.Logger(l => l
                     .Filter.ByIncludingOnly(e => e.Level == LogEventLevel.Information)
@@ -53,19 +54,17 @@ namespace Eppoi.API
 
                     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                     {
-                        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
+                        Description = "Paste here your JWT Token.",
                         Name = "Authorization",
                         In = ParameterLocation.Header,
-                        Type = SecuritySchemeType.ApiKey,
-                        Scheme = "Bearer"
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "bearer",
+                        BearerFormat = "JWT"
                     });
 
-                    c.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
+                    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
                     {
-                        {
-                            new OpenApiSecuritySchemeReference("Bearer"),
-                            new List<string>()
-                        }
+                        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
                     });
                 });
 
