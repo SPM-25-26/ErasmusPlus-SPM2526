@@ -7,6 +7,7 @@ namespace Eppoi.API.Interfaces
     {
         string GenerateToken(User user);
         string GenerateEmailVerificationToken(User user);
+        string GeneratePasswordResetToken(User user);
         ClaimsPrincipal? ValidateToken(string token);
     }
 }

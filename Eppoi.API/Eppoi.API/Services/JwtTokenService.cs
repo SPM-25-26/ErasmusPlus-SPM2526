@@ -1,5 +1,6 @@
 ﻿using Eppoi.API.Entities;
 using Eppoi.API.Interfaces;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -38,6 +39,17 @@ namespace Eppoi.API.Services
             };
 
             return CreateToken(claims, DateTime.UtcNow.AddHours(24)); 
+        }
+
+        public string GeneratePasswordResetToken(User user)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim("purpose", Consts.PurposePasswordReset) 
+            };
+
+            return CreateToken(claims, DateTime.UtcNow.AddMinutes(15));
         }
 
         public ClaimsPrincipal? ValidateToken(string token)
