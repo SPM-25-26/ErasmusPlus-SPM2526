@@ -1,4 +1,5 @@
 using Eppoi.API.Interfaces;
+using Eppoi.API.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -93,6 +94,7 @@ namespace Eppoi.API
 
                 builder.Services.AddScoped<IPasswordHasherService, BCryptPasswordHasherService>();
                 builder.Services.AddScoped<ITokenService, JwtTokenService>();
+                builder.Services.AddScoped<IEmailService, EmailService>();
 
                 var app = builder.Build();
 

@@ -1,6 +1,6 @@
 ﻿using Eppoi.API.Interfaces;
 
-namespace Eppoi.API
+namespace Eppoi.API.Services
 {
     public class BCryptPasswordHasherService : IPasswordHasherService
     {
