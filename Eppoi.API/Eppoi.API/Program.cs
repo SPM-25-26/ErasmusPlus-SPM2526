@@ -1,4 +1,5 @@
 using Eppoi.API.Interfaces;
+using Eppoi.API.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -88,11 +89,22 @@ namespace Eppoi.API
                     };
                 });
 
+                builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy("AllowAll", policy =>
+                    {
+                        policy.AllowAnyOrigin()
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    });
+                });
+
                 builder.Services.AddDbContext<AppDbContext>(options =>
                     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
                 builder.Services.AddScoped<IPasswordHasherService, BCryptPasswordHasherService>();
                 builder.Services.AddScoped<ITokenService, JwtTokenService>();
+                builder.Services.AddScoped<IEmailService, EmailService>();
 
                 builder.Services.AddCors(options =>
                 {
