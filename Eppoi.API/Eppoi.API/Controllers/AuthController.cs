@@ -1,5 +1,4 @@
-﻿using Eppoi.API;
-using Eppoi.API.DTOs;
+﻿using Eppoi.API.DTOs;
 using Eppoi.API.DTOs.Auth;
 using Eppoi.API.Entities;
 using Eppoi.API.Interfaces;
@@ -22,7 +21,10 @@ namespace Eppoi.API.Controllers
         private readonly IEmailService _emailService;
         private readonly IValidator<RegisterRequestDto> _registerValidator;
         private readonly IValidator<LoginRequestDto> _loginValidator;
+        private readonly IValidator<ForgotPasswordRequestDto> _forgotPasswordValidator;
+        private readonly IValidator<ResetPasswordRequestDto> _resetPasswordValidator;
         private readonly ILogger<AuthController> _logger;
+        private readonly IConfiguration _configuration;
 
         public AuthController(
             AppDbContext context,
@@ -31,7 +33,10 @@ namespace Eppoi.API.Controllers
             IEmailService emailService,
             IValidator<RegisterRequestDto> registerValidator,
             IValidator<LoginRequestDto> loginValidator,
-            ILogger<AuthController> logger)
+            IValidator<ForgotPasswordRequestDto> forgotPasswordValidator,
+            IValidator<ResetPasswordRequestDto> resetPasswordValidator,
+            ILogger<AuthController> logger,
+            IConfiguration configuration)
         {
             _context = context;
             _passwordHasher = passwordHasher;
@@ -39,7 +44,10 @@ namespace Eppoi.API.Controllers
             _emailService = emailService;
             _registerValidator = registerValidator;
             _loginValidator = loginValidator;
+            _forgotPasswordValidator = forgotPasswordValidator;
+            _resetPasswordValidator = resetPasswordValidator;
             _logger = logger;
+            _configuration = configuration;
         }
 
         [HttpPost("register")]
@@ -91,8 +99,11 @@ namespace Eppoi.API.Controllers
             _logger.LogInformation("User {Username} successfully registered with ID: {UserId}.", newUser.Username, newUser.Id);
 
             var verificationToken = _tokenService.GenerateEmailVerificationToken(newUser);
-            var requestUrl = $"{Request.Scheme}://{Request.Host}";
-            var verificationLink = $"{requestUrl}/api/auth/verify-email?token={verificationToken}";
+
+            var frontendBaseUrl = _configuration["FrontendUrls:BaseUrl"] ?? "http://localhost:3000";
+            var verificationPath = _configuration["FrontendUrls:EmailVerificationPath"] ?? "/verify-email";
+            var verificationLink = $"{frontendBaseUrl}{verificationPath}?token={verificationToken}";
+
             var emailBody = Consts.GetEmailVerificationBody(newUser.Username, verificationLink);
 
             try
@@ -204,6 +215,98 @@ namespace Eppoi.API.Controllers
                 message = Consts.LoginSuccessful,
                 token
             });
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
+        {
+            _logger.LogInformation("Password reset request initiated for email: {Email}", request.Email);
+
+            var validationResult = await _forgotPasswordValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                _logger.LogWarning("Password reset request validation failed for email: {Email}", request.Email);
+                return BadRequest(validationResult.Errors.Select(e => new { e.PropertyName, e.ErrorMessage }));
+            }
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Mail == request.Email);
+
+            if (user == null)
+            {
+                _logger.LogWarning("Password reset request: Email {Email} does not exist. Generic success returned.", request.Email);
+                return Ok(new { message = Consts.PasswordResetRequested });
+            }
+
+            var resetToken = _tokenService.GeneratePasswordResetToken(user);
+
+            var frontendBaseUrl = _configuration["FrontendUrls:BaseUrl"] ?? "http://localhost:3000";
+            var resetPath = _configuration["FrontendUrls:PasswordResetPath"] ?? "/reset-password";
+            var resetLink = $"{frontendBaseUrl}{resetPath}?token={resetToken}";
+
+            var emailBody = Consts.GetPasswordResetBody(user.Username, resetLink);
+
+            try
+            {
+                _logger.LogInformation("Attempting to send password reset email to {Email}", user.Mail);
+                await _emailService.SendEmailAsync(user.Mail, Consts.PasswordResetSubject, emailBody);
+                _logger.LogInformation("Password reset email successfully sent to {Email}", user.Mail);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send password reset email to {Email}", user.Mail);
+            }
+
+            return Ok(new { message = Consts.PasswordResetRequested });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
+        {
+            _logger.LogInformation("Password reset confirmation attempt started.");
+
+            var validationResult = await _resetPasswordValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                _logger.LogWarning("Password reset validation failed (likely weak password).");
+                return BadRequest(validationResult.Errors.Select(e => new { e.PropertyName, e.ErrorMessage }));
+            }
+
+            var principal = _tokenService.ValidateToken(request.Token);
+            if (principal == null)
+            {
+                _logger.LogWarning("Password reset failed: Token is invalid or expired.");
+                return BadRequest(new { message = Consts.InvalidResetToken });
+            }
+
+            var purposeClaim = principal.FindFirst("purpose")?.Value;
+            if (purposeClaim != Consts.PurposePasswordReset)
+            {
+                _logger.LogWarning("Password reset failed: Invalid token purpose '{Purpose}'.", purposeClaim);
+                return BadRequest(new { message = Consts.InvalidResetToken });
+            }
+
+            var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+            {
+                _logger.LogWarning("Password reset failed: Unable to parse User ID from token.");
+                return BadRequest(new { message = Consts.InvalidResetToken });
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                _logger.LogWarning("Password reset failed: User ID {UserId} not found in database.", userId);
+                return BadRequest(new { message = Consts.InvalidResetToken });
+            }
+
+            user.Password = _passwordHasher.HashPassword(request.NewPassword);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("User {UserId} successfully reset their password.", userId);
+
+            return Ok(new { message = Consts.PasswordResetSuccess });
         }
     }
 }
