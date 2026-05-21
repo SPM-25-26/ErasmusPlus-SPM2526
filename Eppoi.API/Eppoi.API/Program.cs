@@ -94,7 +94,17 @@ namespace Eppoi.API
                 builder.Services.AddScoped<IPasswordHasherService, BCryptPasswordHasherService>();
                 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
+                builder.Services.AddCors(options =>
+                {
+                    options.AddDefaultPolicy(p =>
+                        p.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+                });
+
                 var app = builder.Build();
+
+                app.UseCors();
 
                 if (app.Environment.IsDevelopment())
                 {

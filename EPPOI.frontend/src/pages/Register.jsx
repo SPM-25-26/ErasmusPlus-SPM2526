@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 function Register() {
   const [nome, setNome] = useState('');
+  const [cognome, setCognome] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,11 +12,17 @@ function Register() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (nome.trim().length < 3) {
-      setErrore("Il nome deve contenere almeno 3 caratteri.");
+    // --- VALIDAZIONE LATO CLIENT ---
+    if (nome.trim().length < 2) {
+      setErrore("Il nome deve contenere almeno 2 caratteri.");
+      return;
+    }
+
+    if (cognome.trim().length < 2) {
+      setErrore("Il cognome deve contenere almeno 2 caratteri.");
       return;
     }
 
@@ -53,8 +60,40 @@ function Register() {
       return;
     }
 
+    // Se superiamo i controlli locali, puliamo l'interfaccia e chiamiamo l'API
     setErrore('');
-    navigate('/verify-email');
+
+    // --- CHIAMATA API AL BACKEND .NET ---
+    try {
+      // RICORDATI: Sostituisci PORTA_BACKEND con il numero trovato nel passo 1
+      const response = await fetch('http://localhost:5246/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: nome,
+          surname: cognome,
+          username: username,
+          email: email,
+          password: password,
+          confirmPassword: confermaPassword 
+        })
+      });
+
+      if (response.ok) {
+        // Status 201 Created -> Successo!
+        navigate('/verify-email');
+      } else {
+        // Errore restituito dal backend (es. email già presente)
+        const errorData = await response.json();
+        setErrore(errorData.message || "Errore durante la registrazione. Riprova.");
+      }
+    } catch (error) {
+      // Server spento o irraggiungibile
+      console.error("Errore di rete:", error);
+      setErrore("Impossibile connettersi al server. Assicurati che il backend sia avviato.");
+    }
   };
 
   return (
@@ -69,12 +108,23 @@ function Register() {
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Nome Completo</label>
+          <label>Nome</label>
           <input 
             type="text" 
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            placeholder="Mario Rossi" 
+            placeholder="Mario" 
+            required 
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Cognome</label>
+          <input 
+            type="text" 
+            value={cognome}
+            onChange={(e) => setCognome(e.target.value)}
+            placeholder="Rossi" 
             required 
           />
         </div>
