@@ -3,16 +3,16 @@ import { Link } from 'react-router-dom';
 
 function Home() {
   const categories = [
-    { title: "Articles", icon: "fa-newspaper", path: "/articles", desc: "News and updates from the municipality" },
-    { title: "Art & Culture", icon: "fa-palette", path: "/art-culture", desc: "Museums, exhibitions, and historical heritage" },
-    { title: "Eat & Drink", icon: "fa-utensils", path: "/eat-drink", desc: "Restaurants, bars, and local flavors" },
-    { title: "Entertainment", icon: "fa-ticket-alt", path: "/entertainment", desc: "Cinemas, theaters, and leisure activities" },
-    { title: "Events", icon: "fa-calendar-check", path: "/events", desc: "What to do in the city this week" },
+    { title: "Articles", icon: "fa-newspaper", path: "/ArticlesList", desc: "News and updates from the municipality" },
+    { title: "Art & Culture", icon: "fa-palette", path: "/ArtCultureList", desc: "Museums, exhibitions, and historical heritage" },
+    { title: "Eat & Drink", icon: "fa-utensils", path: "/EatDrinkList", desc: "Restaurants, bars, and local flavors" },
+    { title: "Entertainment", icon: "fa-ticket-alt", path: "/EntertainmentList", desc: "Cinemas, theaters, and leisure activities" },
+    { title: "Events", icon: "fa-calendar-check", path: "/EventsList", desc: "What to do in the city this week" },
     { title: "Nature", icon: "fa-leaf", path: "/nature", desc: "Parks, reserves, and green areas" },
     { title: "Map", icon: "fa-map-marked-alt", path: "/map", desc: "Explore the area interactively" },
-    { title: "Routes", icon: "fa-route", path: "/routes", desc: "Tourist itineraries and trails" },
-    { title: "Organizations", icon: "fa-sitemap", path: "/organizations", desc: "Institutions, associations, and services" },
-    { title: "Shopping", icon: "fa-shopping-bag", path: "/shopping", desc: "Stores and commercial activities" }
+    { title: "Routes", icon: "fa-route", path: "/RoutesList", desc: "Tourist itineraries and trails" },
+    { title: "Organizations", icon: "fa-sitemap", path: "/OrganizationsList", desc: "Institutions, associations, and services" },
+    { title: "Sleep Accommodation", icon: "fa-hotel", path: "/SleepAccommodationList", desc: "Hotels, B&Bs, and welcoming places to stay" }
   ];
 
   return (
