@@ -1,20 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { dummyArticles } from './ArticlesList'; 
+
+const API_BASE_URL = 'https://localhost:7097'; 
 
 function ArticleDetail() {
   const { id } = useParams(); 
   const [article, setArticle] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    
-    const foundArticle = dummyArticles.find(a => a.id === id);
-    setArticle(foundArticle);
+    const fetchArticleDetail = async () => {
+      try {
+        const token = localStorage.getItem('token'); 
+
+        const response = await fetch(`${API_BASE_URL}/api/Articles/${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 404) {
+          throw new Error("Articolo non trovato.");
+        }
+        if (!response.ok) {
+          throw new Error(`Errore HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setArticle(data);
+      } catch (err) {
+        console.error("Errore caricamento dettaglio:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchArticleDetail();
+    }
   }, [id]);
 
-  if (!article) return <div style={{ color: 'white', textAlign: 'center', padding: '50px' }}>Loading...</div>;
+  if (loading) return <div style={{ color: 'white', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>Caricamento articolo...</div>;
+  if (error) return <div style={{ color: '#ef5350', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>{error}</div>;
+  if (!article) return null;
 
-  const sortedParagraphs = [...(article.paragraphs || [])].sort((a, b) => a.position - b.position);
+  const sortedParagraphs = article.paragraphs || [];
 
   return (
     <div style={{ padding: '60px 20px', maxWidth: '800px', margin: '0 auto' }}>
@@ -28,23 +62,27 @@ function ArticleDetail() {
           <h1 style={{ fontSize: '3rem', color: '#FFFFFF', marginBottom: '15px', lineHeight: '1.2' }}>
             {article.title}
           </h1>
-          <h2 style={{ fontSize: '1.4rem', color: '#AAAAAA', fontWeight: 'normal', marginBottom: '20px' }}>
-            {article.subtitle}
-          </h2>
+          {article.subtitle && (
+            <h2 style={{ fontSize: '1.4rem', color: '#AAAAAA', fontWeight: 'normal', marginBottom: '20px' }}>
+              {article.subtitle}
+            </h2>
+          )}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', color: '#4DA8DA', fontSize: '1rem', fontWeight: 'bold' }}>
-            <span><i className="far fa-clock" style={{ marginRight: '8px' }}></i>Reading time: {article.timeToRead}</span>
+            <span><i className="far fa-clock" style={{ marginRight: '8px' }}></i>Reading time: {article.timeToRead || 'N/A'}</span>
           </div>
         </header>
 
         <img 
-          src={article.imagePath} 
-          alt="Main Article" 
+          src={article.imagePath ? `${API_BASE_URL}${article.imagePath}` : 'https://via.placeholder.com/800x400/1E1E1E/4DA8DA?text=No+Image'} 
+          alt={article.title} 
           style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '16px', marginBottom: '40px', boxShadow: '0 8px 20px rgba(0,0,0,0.6)' }} 
         />
 
-        <div style={{ color: '#FFFFFF', fontSize: '1.15rem', lineHeight: '1.8', marginBottom: '60px' }}>
-          <p>{article.script}</p>
-        </div>
+        {article.script && (
+          <div style={{ color: '#FFFFFF', fontSize: '1.15rem', lineHeight: '1.8', marginBottom: '60px' }}>
+            <p>{article.script}</p>
+          </div>
+        )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '60px' }}>
           {sortedParagraphs.map((paragraph, index) => (
@@ -56,8 +94,8 @@ function ArticleDetail() {
             }}>
               {paragraph.referenceImagePath && (
                 <img 
-                  src={paragraph.referenceImagePath} 
-                  alt="Paragraph visual" 
+                  src={`${API_BASE_URL}${paragraph.referenceImagePath}`} 
+                  alt={paragraph.title || 'POI'} 
                   style={{ width: '100%', height: '300px', objectFit: 'cover' }} 
                 />
               )}
@@ -68,18 +106,15 @@ function ArticleDetail() {
                   </span>
                   <h3 style={{ fontSize: '2rem', color: '#FFFFFF', margin: 0 }}>{paragraph.title}</h3>
                 </div>
-                <h4 style={{ color: '#4DA8DA', fontSize: '1.1rem', marginBottom: '20px', marginLeft: '45px' }}>
-                  {paragraph.subtitle}
-                </h4>
-                <p style={{ color: '#CCCCCC', fontSize: '1.05rem', lineHeight: '1.7', marginLeft: '45px', marginBottom: '25px' }}>
-                  {paragraph.script}
-                </p>
-                
-                {paragraph.referenceName && (
-                  <div style={{ marginLeft: '45px', padding: '15px', backgroundColor: '#2A2A2A', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
-                    <i className="fas fa-map-marker-alt" style={{ color: '#4DA8DA' }}></i>
-                    <span style={{ color: '#FFFFFF', fontSize: '0.9rem' }}>Point of Interest: <strong>{paragraph.referenceName}</strong></span>
-                  </div>
+                {paragraph.subtitle && (
+                  <h4 style={{ color: '#4DA8DA', fontSize: '1.1rem', marginBottom: '20px', marginLeft: '45px' }}>
+                    {paragraph.subtitle}
+                  </h4>
+                )}
+                {paragraph.script && (
+                  <p style={{ color: '#CCCCCC', fontSize: '1.05rem', lineHeight: '1.7', marginLeft: '45px', marginBottom: '25px' }}>
+                    {paragraph.script}
+                  </p>
                 )}
               </div>
             </section>

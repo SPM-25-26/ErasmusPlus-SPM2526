@@ -1,50 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-export const dummyArticles = [
-  {
-    id: "demo-1",
-    title: "Example Article Title",
-    subtitle: "A short placeholder subtitle for the layout",
-    script: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    timeToRead: "5 minutes",
-    imagePath: "https://via.placeholder.com/800x400/1E1E1E/4DA8DA?text=Article+Image",
-    paragraphs: [
-      {
-        id: "p1",
-        position: 1,
-        title: "First Paragraph POI",
-        subtitle: "Subtitle for the first point of interest",
-        script: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in venenatis enim. Mauris facilisis justo at tellus gravida.",
-        referenceName: "Example POI Name",
-        referenceCategory: "ArtCulture",
-        referenceImagePath: "https://via.placeholder.com/800x400/2A2A2A/FFFFFF?text=POI+Image+1"
-      },
-      {
-        id: "p2",
-        position: 2,
-        title: "Second Paragraph POI",
-        subtitle: "Subtitle for the second point of interest",
-        script: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.",
-        referenceName: "Another Example POI",
-        referenceCategory: "Nature",
-        referenceImagePath: "https://via.placeholder.com/800x400/2A2A2A/FFFFFF?text=POI+Image+2"
-      }
-    ]
-  },
-  {
-    id: "demo-2",
-    title: "Second Dummy Article",
-    subtitle: "Another placeholder for the grid",
-    script: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    timeToRead: "3 minutes",
-    imagePath: "https://via.placeholder.com/800x400/1E1E1E/4DA8DA?text=Article+Image+2",
-    paragraphs: []
-  }
-];
+const API_BASE_URL = 'https://localhost:7097';
+const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6'; // ID temporaneo di test
 
 function ArticlesList() {
-  const [articles, setArticles] = useState(dummyArticles);
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        // Recuperiamo il token di autenticazione salvato al login
+        const token = localStorage.getItem('token'); 
+
+        const response = await fetch(`${API_BASE_URL}/api/Articles?municipalityId=${MUNICIPALITY_ID}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Errore HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setArticles(data);
+      } catch (err) {
+        console.error("Errore nel caricamento degli articoli:", err);
+        setError("Impossibile caricare gli articoli. Riprova più tardi.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
+
+  if (loading) return <div style={{ color: 'white', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>Caricamento articoli in corso...</div>;
+  if (error) return <div style={{ color: '#ef5350', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>{error}</div>;
 
   return (
     <div style={{ padding: '60px 20px', maxWidth: '1100px', margin: '0 auto' }}>
@@ -55,7 +52,7 @@ function ArticlesList() {
 
       <header style={{ marginBottom: '50px', borderBottom: '1px solid #333', paddingBottom: '20px' }}>
         <h1 style={{ fontSize: '2.8rem', color: '#FFFFFF', marginBottom: '15px' }}>Articles</h1>
-        <p style={{ color: '#AAAAAA', fontSize: '1.1rem' }}>Placeholder description for the articles section.</p>
+        <p style={{ color: '#AAAAAA', fontSize: '1.1rem' }}>News and updates from the municipality.</p>
       </header>
 
       <div style={{ 
@@ -75,15 +72,16 @@ function ArticlesList() {
             border: '1px solid #333',
             transition: 'transform 0.2s'
           }}>
+            {}
             <img 
-              src={article.imagePath} 
-              alt="placeholder" 
+              src={article.imagePath ? `${API_BASE_URL}${article.imagePath}` : 'https://via.placeholder.com/800x400/1E1E1E/4DA8DA?text=No+Image'} 
+              alt={article.title} 
               style={{ width: '100%', height: '220px', objectFit: 'cover' }} 
             />
             <div style={{ padding: '25px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                 <span style={{ color: '#4DA8DA', fontSize: '0.85rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <i className="far fa-clock"></i> {article.timeToRead}
+                  <i className="far fa-clock"></i> {article.timeToRead || 'N/A'}
                 </span>
               </div>
               <h3 style={{ color: '#FFFFFF', marginBottom: '10px', fontSize: '1.4rem', lineHeight: '1.3' }}>
