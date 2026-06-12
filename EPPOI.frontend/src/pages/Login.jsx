@@ -14,7 +14,7 @@ function Login() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5246/api/auth/login', {
+      const response = await fetch('https://localhost:7097/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,8 +28,11 @@ function Login() {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('token', data.token); 
-        navigate('/'); 
+        console.log("Risposta dal server:", data); 
+        
+        localStorage.setItem('token', data.token);
+
+        navigate('/home'); 
       } else {
         setError('Credenziali non corrette.');
       }
