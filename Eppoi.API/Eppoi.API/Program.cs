@@ -105,6 +105,7 @@ namespace Eppoi.API
                 builder.Services.AddScoped<IPasswordHasherService, BCryptPasswordHasherService>();
                 builder.Services.AddScoped<ITokenService, JwtTokenService>();
                 builder.Services.AddScoped<IEmailService, EmailService>();
+                builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
                 builder.Services.AddCors(options =>
                 {
@@ -121,7 +122,10 @@ namespace Eppoi.API
                 if (app.Environment.IsDevelopment())
                 {
                     app.UseSwagger();
-                    app.UseSwaggerUI();
+                    app.UseSwaggerUI(c =>
+                    {
+                        c.EnablePersistAuthorization();
+                    });
                 }
 
                 app.UseHttpsRedirection();

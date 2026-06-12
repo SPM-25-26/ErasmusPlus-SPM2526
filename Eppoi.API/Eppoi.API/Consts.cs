@@ -62,5 +62,23 @@
                 <p style='color: #666;'>You can now return to the application and log in.</p>
             </body>
             </html>";
+
+        // General Messages
+        public const string MunicipalityIdRequired = "Municipality ID parameter is required.";
+        public const string InvalidTimeframe = "Invalid timeframe parameter. Use 'upcoming' or 'past'.";
+
+        // Article Messages
+        public const string ArticleNotFound = "Article not found.";
+        public const string ArticlesRetrieved = "Articles retrieved successfully.";
+        public const string ArticleDetailRetrieved = "Article details retrieved successfully.";
+
+        // Event Messages
+        public const string EventNotFound = "Event not found.";
+        public const string EventsRetrieved = "Events retrieved successfully.";
+        public const string EventDetailRetrieved = "Event details retrieved successfully.";
+
+        // Timeframe Filters
+        public const string TimeframeUpcoming = "upcoming";
+        public const string TimeframePast = "past";
     }
 }
