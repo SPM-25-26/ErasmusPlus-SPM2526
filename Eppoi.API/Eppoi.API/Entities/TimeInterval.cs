@@ -23,11 +23,11 @@ public partial class TimeInterval
     public string? EndDate { get; set; }
 
     [InverseProperty("TimeInterval")]
-    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public virtual ICollection<Booking> Bookings { get; set; } = [];
 
     [InverseProperty("TimeInterval")]
-    public virtual ICollection<OpeningHour> OpeningHours { get; set; } = new List<OpeningHour>();
+    public virtual ICollection<OpeningHour> OpeningHours { get; set; } = [];
 
     [InverseProperty("TimeInterval")]
-    public virtual ICollection<TemporaryClosure> TemporaryClosures { get; set; } = new List<TemporaryClosure>();
+    public virtual ICollection<TemporaryClosure> TemporaryClosures { get; set; } = [];
 }

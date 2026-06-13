@@ -77,8 +77,32 @@
         public const string EventsRetrieved = "Events retrieved successfully.";
         public const string EventDetailRetrieved = "Event details retrieved successfully.";
 
+        // Eat & Drink Messages
+        public const string EatAndDrinkNotFound = "Eat and drink location not found.";
+        public const string EatAndDrinkRetrieved = "Eat and drink locations retrieved successfully.";
+
         // Timeframe Filters
         public const string TimeframeUpcoming = "upcoming";
         public const string TimeframePast = "past";
+
+        // Municipality Messages
+        public const string MunicipalityNotFound = "Municipality not found.";
+        public const string MunicipalitiesRetrieved = "Municipalities retrieved successfully.";
+
+        // Shopping Messages
+        public const string ShoppingLocationNotFound = "Shopping location not found.";
+        public const string ShoppingLocationsRetrieved = "Shopping locations retrieved successfully.";
+
+        // Art & Culture Messages
+        public const string ArtCultureLocationNotFound = "Art and culture location not found.";
+        public const string ArtCultureLocationsRetrieved = "Art and culture locations retrieved successfully.";
+
+        // Entertainment & Leisure Messages
+        public const string EntertainmentLocationNotFound = "Entertainment and leisure location not found.";
+        public const string EntertainmentLocationsRetrieved = "Entertainment and leisure locations retrieved successfully.";
+        
+        // Route Messages
+        public const string RouteNotFound = "Route not found.";
+        public const string RoutesRetrieved = "Routes retrieved successfully.";
     }
 }

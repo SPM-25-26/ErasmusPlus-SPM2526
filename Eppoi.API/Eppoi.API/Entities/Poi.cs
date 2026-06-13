@@ -93,9 +93,9 @@ public partial class Poi
     public virtual PoisSleep? PoisSleep { get; set; }
 
     [InverseProperty("Poi")]
-    public virtual ICollection<RouteStage> RouteStages { get; set; } = new List<RouteStage>();
+    public virtual ICollection<RouteStage> RouteStages { get; set; } = [];
 
     [ForeignKey("PoisId")]
     [InverseProperty("Pois")]
-    public virtual ICollection<Service> Services { get; set; } = new List<Service>();
+    public virtual ICollection<Service> Services { get; set; } = [];
 }

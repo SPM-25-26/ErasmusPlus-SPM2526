@@ -10,18 +10,11 @@ namespace Eppoi.API.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class EventsController : ControllerBase
+    public class EventsController(AppDbContext context, ILogger<EventsController> logger, IMapper mapper) : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly ILogger<EventsController> _logger;
-        private readonly IMapper _mapper;
-
-        public EventsController(AppDbContext context, ILogger<EventsController> logger, IMapper mapper)
-        {
-            _context = context;
-            _logger = logger;
-            _mapper = mapper;
-        }
+        private readonly AppDbContext _context = context;
+        private readonly ILogger<EventsController> _logger = logger;
+        private readonly IMapper _mapper = mapper;
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EventSummaryDto>>> GetEvents(

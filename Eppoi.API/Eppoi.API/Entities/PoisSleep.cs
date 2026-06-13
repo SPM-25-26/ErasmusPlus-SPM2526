@@ -34,14 +34,14 @@ public partial class PoisSleep
     public string? TemporaryClosureId { get; set; }
 
     [InverseProperty("Poi1")]
-    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public virtual ICollection<Booking> Bookings { get; set; } = [];
 
     [ForeignKey("Id")]
     [InverseProperty("PoisSleep")]
     public virtual Poi IdNavigation { get; set; } = null!;
 
     [InverseProperty("SleepPoi")]
-    public virtual ICollection<Offer> Offers { get; set; } = new List<Offer>();
+    public virtual ICollection<Offer> Offers { get; set; } = [];
 
     [ForeignKey("OpeningHoursId")]
     [InverseProperty("PoisSleeps")]

@@ -28,7 +28,7 @@ public partial class PoisEatAndDrink
     public string? TemporaryClosureId { get; set; }
 
     [InverseProperty("Poi")]
-    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public virtual ICollection<Booking> Bookings { get; set; } = [];
 
     [ForeignKey("Id")]
     [InverseProperty("PoisEatAndDrink")]
@@ -44,5 +44,5 @@ public partial class PoisEatAndDrink
 
     [ForeignKey("EatAndDrinkPoiId")]
     [InverseProperty("EatAndDrinkPois")]
-    public virtual ICollection<TypicalProduct> TypicalProducts { get; set; } = new List<TypicalProduct>();
+    public virtual ICollection<TypicalProduct> TypicalProducts { get; set; } = [];
 }

@@ -80,8 +80,8 @@ public partial class Organization
     public virtual Municipality? Municipality { get; set; }
 
     [InverseProperty("OwnerTaxCodeNavigation")]
-    public virtual ICollection<Poi> Pois { get; set; } = new List<Poi>();
+    public virtual ICollection<Poi> Pois { get; set; } = [];
 
     [InverseProperty("OrganizerTaxCodeNavigation")]
-    public virtual ICollection<PoisEvent> PoisEvents { get; set; } = new List<PoisEvent>();
+    public virtual ICollection<PoisEvent> PoisEvents { get; set; } = [];
 }

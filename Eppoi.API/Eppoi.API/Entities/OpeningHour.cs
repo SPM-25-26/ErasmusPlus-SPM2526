@@ -39,16 +39,16 @@ public partial class OpeningHour
     public DateTime UpdatedAt { get; set; }
 
     [InverseProperty("OpeningHours")]
-    public virtual ICollection<PoisEatAndDrink> PoisEatAndDrinks { get; set; } = new List<PoisEatAndDrink>();
+    public virtual ICollection<PoisEatAndDrink> PoisEatAndDrinks { get; set; } = [];
 
     [InverseProperty("OpeningHours")]
-    public virtual ICollection<PoisShopping> PoisShoppings { get; set; } = new List<PoisShopping>();
+    public virtual ICollection<PoisShopping> PoisShoppings { get; set; } = [];
 
     [InverseProperty("OpeningHours")]
-    public virtual ICollection<PoisSleep> PoisSleeps { get; set; } = new List<PoisSleep>();
+    public virtual ICollection<PoisSleep> PoisSleeps { get; set; } = [];
 
     [InverseProperty("OpeningHours")]
-    public virtual ICollection<Service> Services { get; set; } = new List<Service>();
+    public virtual ICollection<Service> Services { get; set; } = [];
 
     [ForeignKey("TimeIntervalId")]
     [InverseProperty("OpeningHours")]

@@ -88,7 +88,7 @@ public partial class Service
     public DateTime UpdatedAt { get; set; }
 
     [InverseProperty("ServicePoi")]
-    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public virtual ICollection<Booking> Bookings { get; set; } = [];
 
     [ForeignKey("MunicipalityId")]
     [InverseProperty("Services")]
@@ -104,5 +104,5 @@ public partial class Service
 
     [ForeignKey("ServicesId")]
     [InverseProperty("Services")]
-    public virtual ICollection<Poi> Pois { get; set; } = new List<Poi>();
+    public virtual ICollection<Poi> Pois { get; set; } = [];
 }
