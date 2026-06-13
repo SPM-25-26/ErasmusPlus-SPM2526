@@ -102,5 +102,5 @@ public partial class Route
     public virtual Municipality? Municipality { get; set; }
 
     [InverseProperty("Route")]
-    public virtual ICollection<RouteStage> RouteStages { get; set; } = new List<RouteStage>();
+    public virtual ICollection<RouteStage> RouteStages { get; set; } = [];
 }

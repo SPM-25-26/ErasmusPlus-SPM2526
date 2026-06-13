@@ -23,5 +23,5 @@ public partial class Site
     public string? Category { get; set; }
 
     [InverseProperty("Site")]
-    public virtual ICollection<PoisArtCultureNature> PoisArtCultureNatures { get; set; } = new List<PoisArtCultureNature>();
+    public virtual ICollection<PoisArtCultureNature> PoisArtCultureNatures { get; set; } = [];
 }

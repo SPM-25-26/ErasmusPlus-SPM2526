@@ -39,16 +39,16 @@ public partial class TemporaryClosure
     public DateTime UpdatedAt { get; set; }
 
     [InverseProperty("TemporaryClosure")]
-    public virtual ICollection<PoisEatAndDrink> PoisEatAndDrinks { get; set; } = new List<PoisEatAndDrink>();
+    public virtual ICollection<PoisEatAndDrink> PoisEatAndDrinks { get; set; } = [];
 
     [InverseProperty("TemporaryClosure")]
-    public virtual ICollection<PoisShopping> PoisShoppings { get; set; } = new List<PoisShopping>();
+    public virtual ICollection<PoisShopping> PoisShoppings { get; set; } = [];
 
     [InverseProperty("TemporaryClosure")]
-    public virtual ICollection<PoisSleep> PoisSleeps { get; set; } = new List<PoisSleep>();
+    public virtual ICollection<PoisSleep> PoisSleeps { get; set; } = [];
 
     [InverseProperty("TemporaryClosure")]
-    public virtual ICollection<Service> Services { get; set; } = new List<Service>();
+    public virtual ICollection<Service> Services { get; set; } = [];
 
     [ForeignKey("TimeIntervalId")]
     [InverseProperty("TemporaryClosures")]

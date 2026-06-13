@@ -21,9 +21,9 @@ public partial class TypicalProduct
 
     [ForeignKey("TypicalProductsId")]
     [InverseProperty("TypicalProducts")]
-    public virtual ICollection<PoisEatAndDrink> EatAndDrinkPois { get; set; } = new List<PoisEatAndDrink>();
+    public virtual ICollection<PoisEatAndDrink> EatAndDrinkPois { get; set; } = [];
 
     [ForeignKey("TypicalProductsId")]
     [InverseProperty("TypicalProducts")]
-    public virtual ICollection<PoisShopping> ShoppingPois { get; set; } = new List<PoisShopping>();
+    public virtual ICollection<PoisShopping> ShoppingPois { get; set; } = [];
 }

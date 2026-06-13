@@ -10,18 +10,11 @@ namespace Eppoi.API.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class ArticlesController : ControllerBase
+    public class ArticlesController(AppDbContext context, ILogger<ArticlesController> logger, IMapper mapper) : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly ILogger<ArticlesController> _logger;
-        private readonly IMapper _mapper; 
-
-        public ArticlesController(AppDbContext context, ILogger<ArticlesController> logger, IMapper mapper)
-        {
-            _context = context;
-            _logger = logger;
-            _mapper = mapper;
-        }
+        private readonly AppDbContext _context = context;
+        private readonly ILogger<ArticlesController> _logger = logger;
+        private readonly IMapper _mapper = mapper;
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ArticleSummaryDto>>> GetArticles([FromQuery] string municipalityId)

@@ -47,7 +47,7 @@ public partial class Article
     public string? BaseUrl { get; set; }
 
     [InverseProperty("Article")]
-    public virtual ICollection<ArticleParagraph> ArticleParagraphs { get; set; } = new List<ArticleParagraph>();
+    public virtual ICollection<ArticleParagraph> ArticleParagraphs { get; set; } = [];
 
     [ForeignKey("MunicipalityId")]
     [InverseProperty("Articles")]

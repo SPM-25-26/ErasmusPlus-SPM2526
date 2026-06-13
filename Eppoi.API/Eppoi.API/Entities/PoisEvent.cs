@@ -37,7 +37,7 @@ public partial class PoisEvent
     public virtual Poi IdNavigation { get; set; } = null!;
 
     [InverseProperty("EventPoi")]
-    public virtual ICollection<Offer> Offers { get; set; } = new List<Offer>();
+    public virtual ICollection<Offer> Offers { get; set; } = [];
 
     [ForeignKey("OrganizerTaxCode")]
     [InverseProperty("PoisEvents")]

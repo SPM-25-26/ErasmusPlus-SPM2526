@@ -70,17 +70,17 @@ public partial class Municipality
     public string? BaseUrl { get; set; }
 
     [InverseProperty("Municipality")]
-    public virtual ICollection<Article> Articles { get; set; } = new List<Article>();
+    public virtual ICollection<Article> Articles { get; set; } = [];
 
     [InverseProperty("Municipality")]
-    public virtual ICollection<Organization> Organizations { get; set; } = new List<Organization>();
+    public virtual ICollection<Organization> Organizations { get; set; } = [];
 
     [InverseProperty("Municipality")]
-    public virtual ICollection<Poi> Pois { get; set; } = new List<Poi>();
+    public virtual ICollection<Poi> Pois { get; set; } = [];
 
     [InverseProperty("Municipality")]
-    public virtual ICollection<Route> Routes { get; set; } = new List<Route>();
+    public virtual ICollection<Route> Routes { get; set; } = [];
 
     [InverseProperty("Municipality")]
-    public virtual ICollection<Service> Services { get; set; } = new List<Service>();
+    public virtual ICollection<Service> Services { get; set; } = [];
 }

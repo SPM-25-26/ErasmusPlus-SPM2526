@@ -27,13 +27,13 @@ public partial class PoisArtCultureNature
     public string? SiteId { get; set; }
 
     [InverseProperty("ArtCultureNaturePoi")]
-    public virtual ICollection<Catalogue> Catalogues { get; set; } = new List<Catalogue>();
+    public virtual ICollection<Catalogue> Catalogues { get; set; } = [];
 
     [InverseProperty("ArtCultureNaturePoi")]
-    public virtual ICollection<CreativeWork> CreativeWorks { get; set; } = new List<CreativeWork>();
+    public virtual ICollection<CreativeWork> CreativeWorks { get; set; } = [];
 
     [InverseProperty("ArtCultureNaturePoi")]
-    public virtual ICollection<CulturalProject> CulturalProjects { get; set; } = new List<CulturalProject>();
+    public virtual ICollection<CulturalProject> CulturalProjects { get; set; } = [];
 
     [ForeignKey("Id")]
     [InverseProperty("PoisArtCultureNature")]
