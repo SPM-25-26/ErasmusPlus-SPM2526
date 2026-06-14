@@ -1,33 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-export const dummyRoutes = [
-  {
-    id: "4231cb1d-b700-4ed2-baf9-9bbe284038e1",
-    name: "Example Itinerary Name",
-    pathTheme: "Naturalistic", 
-    travellingMethod: "By Bicycle", 
-    routeLength: "25", 
-    duration: "2 hours", 
-    securityLevel: "Medium",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    imagePath: "https://images.unsplash.com/photo-1541614101331-1a5a3a194e92?w=800&q=80"
-  },
-  {
-    id: "demo-route-2",
-    name: "Historical Village Trail",
-    pathTheme: "Historical",
-    travellingMethod: "Walking",
-    routeLength: "8",
-    duration: "3 hours",
-    securityLevel: "Low",
-    description: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    imagePath: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=800&q=80"
-  }
-];
+const API_BASE_URL = 'https://localhost:7097';
+const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6';
 
 function RoutesList() {
-  const [routes, setRoutes] = useState(dummyRoutes);
+  const [routes, setRoutes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const token = localStorage.getItem('token'); 
+
+        const response = await fetch(`${API_BASE_URL}/api/Routes?municipalityId=${MUNICIPALITY_ID}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Errore HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setRoutes(data);
+      } catch (err) {
+        console.error("Errore nel caricamento Routes:", err);
+        setError("Impossibile caricare gli itinerari. Riprova più tardi.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoutes();
+  }, []);
+
+  if (loading) return <div style={{ color: 'white', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>Caricamento itinerari...</div>;
+  if (error) return <div style={{ color: '#ef5350', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>{error}</div>;
 
   return (
     <div style={{ padding: '60px 20px', maxWidth: '1100px', margin: '0 auto' }}>
@@ -59,19 +72,23 @@ function RoutesList() {
             transition: 'transform 0.2s'
           }}>
             <img 
-              src={route.imagePath} 
+              src={route.imagePath ? `${API_BASE_URL}${route.imagePath}` : 'https://images.unsplash.com/photo-1541614101331-1a5a3a194e92?w=800&q=80'} 
               alt={route.name} 
               style={{ width: '100%', height: '220px', objectFit: 'cover' }} 
             />
             <div style={{ padding: '25px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
               
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '15px' }}>
-                <span style={{ backgroundColor: '#2A2A2A', color: '#4DA8DA', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  {route.pathTheme}
-                </span>
-                <span style={{ backgroundColor: '#2A2A2A', color: '#FFFFFF', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem' }}>
-                  <i className="fas fa-bicycle" style={{ marginRight: '5px' }}></i>{route.travellingMethod}
-                </span>
+                {route.pathTheme && (
+                  <span style={{ backgroundColor: '#2A2A2A', color: '#4DA8DA', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                    {route.pathTheme}
+                  </span>
+                )}
+                {route.travellingMethod && (
+                  <span style={{ backgroundColor: '#2A2A2A', color: '#FFFFFF', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem' }}>
+                    <i className="fas fa-bicycle" style={{ marginRight: '5px' }}></i>{route.travellingMethod}
+                  </span>
+                )}
               </div>
 
               <h3 style={{ color: '#FFFFFF', marginBottom: '10px', fontSize: '1.4rem', lineHeight: '1.3' }}>
@@ -79,8 +96,8 @@ function RoutesList() {
               </h3>
               
               <div style={{ display: 'flex', gap: '15px', color: '#AAAAAA', fontSize: '0.9rem', marginTop: '10px', marginBottom: '15px' }}>
-                <span><i className="fas fa-route" style={{ color: '#4DA8DA', marginRight: '5px' }}></i>{route.routeLength} km</span>
-                <span><i className="far fa-clock" style={{ color: '#4DA8DA', marginRight: '5px' }}></i>{route.duration}</span>
+                {route.routeLength && <span><i className="fas fa-route" style={{ color: '#4DA8DA', marginRight: '5px' }}></i>{route.routeLength} km</span>}
+                {route.duration && <span><i className="far fa-clock" style={{ color: '#4DA8DA', marginRight: '5px' }}></i>{route.duration}</span>}
               </div>
 
               <div style={{ color: '#4DA8DA', fontWeight: 'bold', fontSize: '0.9rem', marginTop: 'auto', textAlign: 'right' }}>
