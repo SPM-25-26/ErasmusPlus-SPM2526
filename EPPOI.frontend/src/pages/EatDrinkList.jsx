@@ -1,44 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-export const dummyEatDrink = [
-  {
-    id: "4e6a8ea5-b464-4777-8106-67e62fd04720",
-    name: "La Tradizione",
-    type: "Diner / Hot Food", 
-    dietaryNeeds: ["Vegetarian Friendly", "Lactose Free", "Gluten Free"],
-    excerpt: "Authentic local flavors served fast. Perfect for a quick lunch break during your city tour.",
-    imagePath: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80",
-    openingHours: "Mon-Sat: 11:30 AM - 3:30 PM"
-  },
-  {
-    id: "demo-eat-2",
-    name: "Ocean View Seafood",
-    type: "Restaurant",
-    dietaryNeeds: ["Gluten Free Options"],
-    excerpt: "Premium seafood restaurant offering the catch of the day with an incredible coastal view.",
-    imagePath: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
-    openingHours: "Tue-Sun: 7:00 PM - 11:00 PM"
-  },
-  {
-    id: "demo-eat-3",
-    name: "Central Hub Cafe",
-    type: "Cafe & Bar",
-    dietaryNeeds: ["Vegan Options", "Vegetarian Friendly"],
-    excerpt: "Artisanal coffee, fresh pastries, and signature cocktails in the heart of the historic center.",
-    imagePath: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80",
-    openingHours: "Everyday: 7:00 AM - 12:00 AM"
-  }
-];
+const API_BASE_URL = 'https://localhost:7097';
+const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6';
 
 function EatDrinkList() {
-  const [places, setPlaces] = useState(dummyEatDrink);
+  const [places, setPlaces] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchEatDrink = async () => {
+      try {
+        const token = localStorage.getItem('token'); 
+
+        // Rotta esatta dal controller: api/pois/eat-drink
+        const response = await fetch(`${API_BASE_URL}/api/pois/eat-drink?municipalityId=${MUNICIPALITY_ID}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Errore HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setPlaces(data);
+      } catch (err) {
+        console.error("Errore nel caricamento Eat & Drink:", err);
+        setError("Impossibile caricare i locali. Riprova più tardi.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEatDrink();
+  }, []);
+
+  if (loading) return <div style={{ color: 'white', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>Caricamento in corso...</div>;
+  if (error) return <div style={{ color: '#ef5350', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>{error}</div>;
 
   return (
     <div style={{ padding: '60px 20px', maxWidth: '1100px', margin: '0 auto' }}>
+
       <Link to="/home" style={{ color: '#4DA8DA', textDecoration: 'none', display: 'inline-block', marginBottom: '30px', fontWeight: 'bold' }}>
         &larr; Back to Home
       </Link>
+      
       <header style={{ marginBottom: '50px', borderBottom: '1px solid #333', paddingBottom: '20px' }}>
         <h1 style={{ fontSize: '2.8rem', color: '#FFFFFF', marginBottom: '15px' }}>Eat & Drink</h1>
         <p style={{ color: '#AAAAAA', fontSize: '1.1rem' }}>Discover the best restaurants, cafes, and local flavors.</p>
@@ -62,18 +73,21 @@ function EatDrinkList() {
             transition: 'transform 0.2s'
           }}>
             <img 
-              src={place.imagePath} 
-              alt={place.name} 
+              src={place.primaryImagePath ? `${API_BASE_URL}${place.primaryImagePath}` : 'https://images.unsplash.com/photo-1414235077428-338988a2e8c0?w=800&q=80'} 
+              alt={place.officialName} 
               style={{ width: '100%', height: '220px', objectFit: 'cover' }} 
             />
             <div style={{ padding: '25px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
               
-              {/* Contenitore per Type e Dietary Needs */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '15px' }}>
-                <span style={{ backgroundColor: '#2A2A2A', color: '#4DA8DA', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  {place.type}
-                </span>
-                {place.dietaryNeeds.slice(0, 2).map((need, idx) => ( // Mostriamo max 2 tag alimentari nella card per non sporcare il design
+                {place.type && (
+                  <span style={{ backgroundColor: '#2A2A2A', color: '#4DA8DA', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                    {place.type}
+                  </span>
+                )}
+                
+                {/* Mostriamo massimo 2 tag alimentari (dietaryNeeds) per non ingombrare la card */}
+                {place.dietaryNeeds && place.dietaryNeeds.slice(0, 2).map((need, idx) => ( 
                   <span key={idx} style={{ backgroundColor: '#1A3320', color: '#81C784', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem' }}>
                     {need}
                   </span>
@@ -81,16 +95,16 @@ function EatDrinkList() {
               </div>
 
               <h3 style={{ color: '#FFFFFF', marginBottom: '10px', fontSize: '1.4rem', lineHeight: '1.3' }}>
-                {place.name}
+                {place.officialName}
               </h3>
-              <p style={{ color: '#AAAAAA', fontSize: '0.95rem', lineHeight: '1.5', margin: '0 0 20px 0', flexGrow: 1 }}>
-                {place.excerpt}
-              </p>
               
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-                <span style={{ color: '#888888', fontSize: '0.85rem' }}>
-                  <i className="far fa-clock" style={{ marginRight: '5px' }}></i> {place.openingHours.split(':')[0]}
-                </span>
+              {place.address && (
+                <p style={{ color: '#AAAAAA', fontSize: '0.95rem', lineHeight: '1.5', margin: '0 0 20px 0', flexGrow: 1 }}>
+                  <i className="fas fa-map-marker-alt" style={{ marginRight: '5px' }}></i> {place.address}
+                </p>
+              )}
+              
+              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 'auto' }}>
                 <span style={{ color: '#4DA8DA', fontWeight: 'bold', fontSize: '0.9rem' }}>
                   Menu & Info &rarr;
                 </span>
