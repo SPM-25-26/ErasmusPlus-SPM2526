@@ -22,6 +22,8 @@ import OrganizationsList from './pages/OrganizationsList';
 import OrganizationsDetail from './pages/OrganizationsDetail';
 import SleepAccommodationList from './pages/SleepAccommodationList';
 import SleepAccommodationDetail from './pages/SleepAccommodationDetail';
+import ShoppingDetail from './pages/ShoppingDetail';
+import ShoppingList from './pages/ShoppingList';
 
 function App() {
   return (
@@ -51,6 +53,8 @@ function App() {
         <Route path="/OrganizationsDetail/:id" element={<OrganizationsDetail />} />
         <Route path="/SleepAccommodationList" element={<SleepAccommodationList />} />
         <Route path="/SleepAccommodationDetail/:id" element={<SleepAccommodationDetail />} />
+        <Route path="/ShoppingList" element={<ShoppingList/>} />
+        <Route path="/ShoppingDetail/:id" element={<ShoppingDetail/>} />
         
       </Routes>
     </BrowserRouter>
