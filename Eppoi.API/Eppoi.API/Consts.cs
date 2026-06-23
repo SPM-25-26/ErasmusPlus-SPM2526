@@ -104,5 +104,13 @@
         // Route Messages
         public const string RouteNotFound = "Route not found.";
         public const string RoutesRetrieved = "Routes retrieved successfully.";
+
+        // Sleep & Accommodation Messages
+        public const string SleepLocationNotFound = "Accommodation not found.";
+        public const string SleepLocationsRetrieved = "Accommodations retrieved successfully.";
+
+        // Organization Messages
+        public const string OrganizationNotFound = "Organization not found.";
+        public const string OrganizationsRetrieved = "Organizations retrieved successfully.";
     }
 }
