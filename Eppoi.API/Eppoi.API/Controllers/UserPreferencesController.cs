@@ -203,6 +203,57 @@ namespace Eppoi.API.Controllers
             return recommendedItems;
         }
 
+        [HttpGet("status")]
+        public async Task<ActionResult<bool>> HasCompletedQuestionnaire()
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!Guid.TryParse(userIdString, out var userId))
+                return Unauthorized(new { message = "Unauthorized access." });
+
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(up => up.Id == userId);
+            
+            if (user == null)
+                return NotFound(new { message = "User not found." });
+
+            bool hasPreferences = user.HasCompletedFirstLogin.HasValue ? user.HasCompletedFirstLogin.Value : false;
+
+            return Ok(new { hasCompleted = hasPreferences });
+        }
+
+        [HttpGet("available-categories")]
+        public async Task<ActionResult<IEnumerable<string>>> GetAvailableCategories([FromQuery] string municipalityId)
+        {
+            if (string.IsNullOrWhiteSpace(municipalityId))
+                return BadRequest(new { message = Consts.MunicipalityIdRequired });
+
+            _logger.LogInformation("Extracting available distinct categories for Municipality: {MunicipalityId}", municipalityId);
+
+            var query = _context.Pois.AsNoTracking().Where(p => p.MunicipalityId == municipalityId);
+
+            var categories = await query
+                .Select(p => p.PoisEvent != null ? p.PoisEvent.Typology :
+                             p.PoisArtCultureNature != null ? (p.PoisArtCultureNature.ArtCultureNatureType ?? p.PoisArtCultureNature.Type) :
+                             p.PoisEatAndDrink != null ? p.PoisEatAndDrink.Type :
+                             p.PoisShopping != null ? p.PoisShopping.PoiCategory :
+                             p.PoisEntertainmentLeisure != null ? p.PoisEntertainmentLeisure.Category :
+                             p.PoisSleep != null ? p.PoisSleep.Typology : null)
+                .Where(c => c != null)
+                .Distinct()
+                .ToListAsync();
+
+            var cleanCategories = categories
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Select(c => c!.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(c => c)
+                .ToList();
+
+            return Ok(cleanCategories);
+        }
+
         private double CalculateHaversineDistance(double lat1, double lon1, double lat2, double lon2)
         {
             const double R = 6371; 

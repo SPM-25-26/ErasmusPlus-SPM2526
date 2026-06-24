@@ -207,6 +207,7 @@ namespace Eppoi.API.Controllers
             }
 
             var token = _tokenService.GenerateToken(user);
+            if (!user.HasCompletedFirstLogin.HasValue || !user.HasCompletedFirstLogin.Value) user.HasCompletedFirstLogin = true;
 
             _logger.LogInformation("User {UserId} logged in successfully.", user.Id);
 
