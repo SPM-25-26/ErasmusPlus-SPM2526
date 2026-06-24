@@ -24,6 +24,7 @@ import SleepAccommodationList from './pages/SleepAccommodationList';
 import SleepAccommodationDetail from './pages/SleepAccommodationDetail';
 import ShoppingDetail from './pages/ShoppingDetail';
 import ShoppingList from './pages/ShoppingList';
+import InteractiveMap from './pages/InteractiveMap'; 
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
         <Route path="/SleepAccommodationDetail/:id" element={<SleepAccommodationDetail />} />
         <Route path="/ShoppingList" element={<ShoppingList/>} />
         <Route path="/ShoppingDetail/:id" element={<ShoppingDetail/>} />
+        <Route path="/map" element={<InteractiveMap />} />
         
       </Routes>
     </BrowserRouter>
