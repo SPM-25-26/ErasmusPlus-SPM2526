@@ -13,7 +13,8 @@ namespace Eppoi.API.Mappers
             CreateMap<ArticleParagraph, ArticleParagraphDto>();
 
             CreateMap<PoisEvent, EventSummaryDto>()
-                .ForMember(dest => dest.OrganizerName, opt => opt.MapFrom(src => src.OrganizerTaxCodeNavigation != null ? src.OrganizerTaxCodeNavigation.LegalName : null));
+                .ForMember(dest => dest.OrganizerName, opt => opt.MapFrom(src => src.OrganizerTaxCodeNavigation != null ? src.OrganizerTaxCodeNavigation.LegalName : null))
+                .ForMember(dest => dest.PrimaryImagePath, opt => opt.MapFrom(src => src.IdNavigation != null ? src.IdNavigation.PrimaryImagePath : null));
 
             CreateMap<PoisEvent, EventDetailDto>()
                 .ForMember(dest => dest.OrganizerName, opt => opt.MapFrom(src => src.OrganizerTaxCodeNavigation != null ? src.OrganizerTaxCodeNavigation.LegalName : null))

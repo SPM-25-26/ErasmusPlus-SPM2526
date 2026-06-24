@@ -7,6 +7,7 @@
         public string? Typology { get; set; }
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
+        public string? PrimaryImagePath { get; set; }
         public string? OrganizerName { get; set; }
     }
 
