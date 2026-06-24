@@ -13,7 +13,8 @@ function Home() {
     { title: "Routes", icon: "fa-route", path: "/RoutesList", desc: "Tourist itineraries and trails" },
     { title: "Organizations", icon: "fa-sitemap", path: "/OrganizationsList", desc: "Institutions, associations, and services" },
     { title: "Sleep Accommodation", icon: "fa-hotel", path: "/SleepAccommodationList", desc: "Hotels, B&Bs, and welcoming places to stay" },
-    { title: "Shopping", icon: "fa-shopping-bag", path: "/ShoppingList", desc: "Stores, boutiques, and local products" }
+    { title: "Shopping", icon: "fa-shopping-bag", path: "/ShoppingList", desc: "Stores, boutiques, and local products" },
+    { title: "Map", icon: "fa-map-marked-alt", path: "/map", desc: "Explore the area interactively" }
   ];
 
   return (

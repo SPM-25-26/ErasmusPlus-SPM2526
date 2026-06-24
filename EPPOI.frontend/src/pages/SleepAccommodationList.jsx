@@ -1,39 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-export const dummyAccommodations = [
-  {
-    id: "0515f19a-e5f9-4119-8e23-63398bb267f1",
-    name: "Placeholder Hotel Name",
-    classification: "3.0", 
-    typology: "Albergo/Hotel", 
-    roomTypologies: ["Single Room", "Double Room", "Family Suite"],
-    shortAddress: "52, Via Nazario Sauro, Marano", 
-    excerpt: "Comfortable stay located in a strategic position, offering panoramic views and modern amenities for travelers.",
-    imagePath: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80"
-  },
-  {
-    id: "demo-sleep-2",
-    name: "Sea Breeze Bed & Breakfast",
-    classification: "4.0",
-    typology: "B&B",
-    roomTypologies: ["Standard Double", "Deluxe Sea View"],
-    shortAddress: "10, Lungomare Centro",
-    excerpt: "A charming and cozy bed & breakfast just a few steps away from the golden sand and local attractions.",
-    imagePath: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80"
-  }
-];
+const API_BASE_URL = 'https://localhost:7097';
+const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6';
 
 function SleepAccommodationList() {
-  const [places, setPlaces] = useState(dummyAccommodations);
+  const [places, setPlaces] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchAccommodations = async () => {
+      try {
+        const token = localStorage.getItem('token'); 
+
+        const response = await fetch(`${API_BASE_URL}/api/pois/sleep?municipalityId=${MUNICIPALITY_ID}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Errore HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setPlaces(data);
+      } catch (err) {
+        console.error("Errore nel caricamento Accommodations:", err);
+        setError("Impossibile caricare gli alloggi. Riprova più tardi.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccommodations();
+  }, []);
 
   const renderStars = (rating) => {
-    const numStars = Math.floor(parseFloat(rating));
+    if (!rating) return null;
+    const parsedRating = parseFloat(rating);
+    if (isNaN(parsedRating)) return null; // Evita errori se la classificazione non contiene numeri
+    
+    const numStars = Math.floor(parsedRating);
     return Array.from({ length: numStars }, (_, i) => (
       <i key={i} className="fas fa-star" style={{ color: '#F5B041', marginRight: '2px', fontSize: '0.9rem' }}></i>
     ));
   };
+
+  if (loading) return <div style={{ color: 'white', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>Caricamento alloggi...</div>;
+  if (error) return <div style={{ color: '#ef5350', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>{error}</div>;
 
   return (
     <div style={{ padding: '60px 20px', maxWidth: '1100px', margin: '0 auto' }}>
@@ -65,33 +83,33 @@ function SleepAccommodationList() {
             transition: 'transform 0.2s'
           }}>
             <img 
-              src={place.imagePath} 
-              alt={place.name} 
+              src={place.primaryImagePath ? `${API_BASE_URL}${place.primaryImagePath}` : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80'} 
+              alt={place.officialName} 
               style={{ width: '100%', height: '220px', objectFit: 'cover' }} 
             />
             <div style={{ padding: '25px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <span style={{ backgroundColor: '#2A2A2A', color: '#4DA8DA', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  {place.typology}
-                </span>
+                {place.typology && (
+                  <span style={{ backgroundColor: '#2A2A2A', color: '#4DA8DA', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                    {place.typology}
+                  </span>
+                )}
                 <div style={{ display: 'flex' }}>
                   {renderStars(place.classification)}
                 </div>
               </div>
 
               <h3 style={{ color: '#FFFFFF', marginBottom: '10px', fontSize: '1.4rem', lineHeight: '1.3' }}>
-                {place.name}
+                {place.officialName}
               </h3>
               
-              <div style={{ color: '#AAAAAA', fontSize: '0.85rem', marginBottom: '15px' }}>
-                <i className="fas fa-map-marker-alt" style={{ marginRight: '5px', color: '#4DA8DA' }}></i>
-                {place.shortAddress}
-              </div>
-
-              <p style={{ color: '#AAAAAA', fontSize: '0.95rem', lineHeight: '1.5', margin: '0 0 20px 0', flexGrow: 1 }}>
-                {place.excerpt}
-              </p>
+              {place.address && (
+                <div style={{ color: '#AAAAAA', fontSize: '0.85rem', marginBottom: '15px' }}>
+                  <i className="fas fa-map-marker-alt" style={{ marginRight: '5px', color: '#4DA8DA' }}></i>
+                  {place.address}
+                </div>
+              )}
               
               <div style={{ color: '#4DA8DA', fontWeight: 'bold', fontSize: '0.9rem', marginTop: 'auto', textAlign: 'right' }}>
                 Book & Details &rarr;

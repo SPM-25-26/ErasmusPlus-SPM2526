@@ -1,38 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-export const dummyOrganizations = [
-  {
-    id: "00287410443", 
-    legalName: "Camping Led Zeppelin S.R.L.",
-    type: "Camping & RV Areas", 
-    address: "5, Contrada Boccabianca",
-    description: "Modern camping facility offering the benefits of a tourist village. Located between the blue sea and the beautiful hills, with a private beach.",
-    primaryImagePath: "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=800&q=80",
-    telephone: "0735 778125"
-  },
-  {
-    id: "demo-org-2",
-    legalName: "City Tourist Board",
-    type: "Public Service",
-    address: "Piazza della Libertà 1",
-    description: "Official tourist information center. We provide maps, guided tour bookings, and assistance for all visitors.",
-    primaryImagePath: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
-    telephone: "0735 123456"
-  },
-  {
-    id: "demo-org-3",
-    legalName: "Cultural Association 'Il Borgo'",
-    type: "Non-Profit Organization",
-    address: "Via Roma 42",
-    description: "Local association dedicated to preserving historical traditions and organizing neighborhood festivals.",
-    primaryImagePath: "https://images.unsplash.com/photo-1577415124269-fc1140a69e91?w=800&q=80",
-    telephone: "0735 987654"
-  }
-];
+const API_BASE_URL = 'https://localhost:7097';
+const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6';
 
 function OrganizationsList() {
-  const [organizations, setOrganizations] = useState(dummyOrganizations);
+  const [organizations, setOrganizations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      try {
+        const token = localStorage.getItem('token'); 
+
+        const response = await fetch(`${API_BASE_URL}/api/Organizations?municipalityId=${MUNICIPALITY_ID}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Errore HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setOrganizations(data);
+      } catch (err) {
+        console.error("Errore nel caricamento Organizations:", err);
+        setError("Impossibile caricare le organizzazioni. Riprova più tardi.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrganizations();
+  }, []);
+
+  if (loading) return <div style={{ color: 'white', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>Caricamento organizzazioni...</div>;
+  if (error) return <div style={{ color: '#ef5350', textAlign: 'center', padding: '100px', fontSize: '1.2rem' }}>{error}</div>;
 
   return (
     <div style={{ padding: '60px 20px', maxWidth: '1100px', margin: '0 auto' }}>
@@ -52,7 +60,8 @@ function OrganizationsList() {
         gap: '40px' 
       }}>
         {organizations.map((org) => (
-          <Link to={`/OrganizationsDetail/${org.id}`} key={org.id} style={{ 
+          // Usiamo org.taxCode invece di org.id perché il DTO si chiama così
+          <Link to={`/OrganizationsDetail/${org.taxCode}`} key={org.taxCode} style={{ 
             textDecoration: 'none',
             display: 'flex',
             flexDirection: 'column',
@@ -64,35 +73,32 @@ function OrganizationsList() {
             transition: 'transform 0.2s'
           }}>
             <img 
-              src={org.primaryImagePath} 
+              src={org.primaryImagePath ? `${API_BASE_URL}${org.primaryImagePath}` : 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80'} 
               alt={org.legalName} 
               style={{ width: '100%', height: '200px', objectFit: 'cover' }} 
             />
             <div style={{ padding: '25px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
               
               <div style={{ marginBottom: '15px' }}>
-                <span style={{ backgroundColor: '#2A2A2A', color: '#4DA8DA', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase' }}>
-                  {org.type}
-                </span>
+                {org.type && (
+                  <span style={{ backgroundColor: '#2A2A2A', color: '#4DA8DA', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                    {org.type}
+                  </span>
+                )}
               </div>
 
               <h3 style={{ color: '#FFFFFF', marginBottom: '10px', fontSize: '1.4rem', lineHeight: '1.3' }}>
                 {org.legalName}
               </h3>
               
-              <div style={{ color: '#AAAAAA', fontSize: '0.85rem', marginBottom: '15px' }}>
-                <i className="fas fa-map-marker-alt" style={{ marginRight: '5px', color: '#4DA8DA' }}></i>
-                {org.address}
-              </div>
+              {org.address && (
+                <div style={{ color: '#AAAAAA', fontSize: '0.85rem', marginBottom: '15px' }}>
+                  <i className="fas fa-map-marker-alt" style={{ marginRight: '5px', color: '#4DA8DA' }}></i>
+                  {org.address}
+                </div>
+              )}
 
-              <p style={{ color: '#AAAAAA', fontSize: '0.95rem', lineHeight: '1.5', margin: '0 0 20px 0', flexGrow: 1 }}>
-                {org.description}
-              </p>
-              
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', borderTop: '1px solid #333', paddingTop: '15px' }}>
-                <span style={{ color: '#E0E0E0', fontSize: '0.9rem' }}>
-                  <i className="fas fa-phone" style={{ marginRight: '5px', color: '#4DA8DA' }}></i> {org.telephone}
-                </span>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'auto', borderTop: '1px solid #333', paddingTop: '15px' }}>
                 <span style={{ color: '#4DA8DA', fontWeight: 'bold', fontSize: '0.9rem' }}>
                   Profile &rarr;
                 </span>
