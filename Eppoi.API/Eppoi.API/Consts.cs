@@ -112,5 +112,13 @@
         // Organization Messages
         public const string OrganizationNotFound = "Organization not found.";
         public const string OrganizationsRetrieved = "Organizations retrieved successfully.";
+
+        // User Preferences Messages
+        public const string PreferencesSaved = "User preferences saved successfully.";
+        public const string PreferencesRetrieved = "User preferences retrieved successfully.";
+
+        // Recommendations Messages
+        public const string RecommendationsRetrieved = "Personalized recommendations retrieved successfully.";
+        public const string NoPreferencesFound = "No preferences found for the user. Returning generic popular content.";
     }
 }
