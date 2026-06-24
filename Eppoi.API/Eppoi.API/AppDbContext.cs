@@ -42,6 +42,7 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<TimeInterval> TimeIntervals { get; set; }
     public virtual DbSet<TypicalProduct> TypicalProducts { get; set; }
     public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<UserPreference> UserPreference { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -332,6 +333,11 @@ public partial class AppDbContext : DbContext
         modelBuilder.Entity<TypicalProduct>(entity =>
         {
             entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+        });
+
+        modelBuilder.Entity<UserPreference>(entity =>
+        {
+            entity.HasKey(e => e.Id);
         });
 
         OnModelCreatingPartial(modelBuilder);
