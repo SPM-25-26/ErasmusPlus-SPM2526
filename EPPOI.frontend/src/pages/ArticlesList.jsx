@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
-const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6'; // ID temporaneo di test
+const MEDIA_BASE_URL = 'https://eppoi.io';
+const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6'; 
 
 function ArticlesList() {
   const [articles, setArticles] = useState([]);
@@ -12,7 +13,6 @@ function ArticlesList() {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        // Recuperiamo il token di autenticazione salvato al login
         const token = localStorage.getItem('token'); 
 
         const response = await fetch(`${API_BASE_URL}/api/Articles?municipalityId=${MUNICIPALITY_ID}`, {
@@ -72,9 +72,8 @@ function ArticlesList() {
             border: '1px solid #333',
             transition: 'transform 0.2s'
           }}>
-            {}
             <img 
-              src={article.imagePath ? `${API_BASE_URL}${article.imagePath}` : 'https://via.placeholder.com/800x400/1E1E1E/4DA8DA?text=No+Image'} 
+              src={article.imagePath ? `${MEDIA_BASE_URL}${article.imagePath}` : 'https://via.placeholder.com/800x400/1E1E1E/4DA8DA?text=No+Image'} 
               alt={article.title} 
               style={{ width: '100%', height: '220px', objectFit: 'cover' }} 
             />

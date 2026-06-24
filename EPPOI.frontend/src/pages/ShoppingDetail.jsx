@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
+const MEDIA_BASE_URL = 'https://eppoi.io'; 
 
 function ShoppingDetail() {
   const { id } = useParams();
@@ -78,7 +79,7 @@ function ShoppingDetail() {
         </header>
 
         <img 
-          src={shop.primaryImagePath ? `${API_BASE_URL}${shop.primaryImagePath}` : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80'} 
+          src={shop.primaryImagePath ? `${MEDIA_BASE_URL}${shop.primaryImagePath}` : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80'} 
           alt={shop.officialName} 
           style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '16px', marginBottom: '40px', boxShadow: '0 8px 20px rgba(0,0,0,0.6)' }} 
         />
@@ -90,7 +91,6 @@ function ShoppingDetail() {
         )}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', marginBottom: '50px' }}>
-          {/* Sezione Info Negozio */}
           <section style={{ backgroundColor: '#1E1E1E', padding: '30px', borderRadius: '12px', border: '1px solid #333' }}>
             <h3 style={{ color: '#FFFFFF', fontSize: '1.5rem', marginBottom: '20px' }}>Store Information</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#AAAAAA', fontSize: '1.05rem', lineHeight: '2' }}>
@@ -122,14 +122,12 @@ function ShoppingDetail() {
           </section>
         </div>
 
-        {/* Prodotti Tipici */}
         {shop.typicalProducts && shop.typicalProducts.length > 0 && (
           <section style={{ backgroundColor: '#2A2A2A', padding: '30px', borderRadius: '12px', border: '1px solid #4DA8DA' }}>
             <h3 style={{ color: '#FFFFFF', fontSize: '1.8rem', marginBottom: '20px' }}>Typical Products</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
               {shop.typicalProducts.map((product, index) => (
                 <div key={index} style={{ backgroundColor: '#1E1E1E', padding: '15px', borderRadius: '8px', border: '1px solid #333' }}>
-                  {/* Assumendo che il DTO dei TypicalProducts abbia un 'name' o 'description' */}
                   <h4 style={{ color: '#f5b041', margin: '0 0 10px 0', fontSize: '1.1rem' }}>
                     {product.name || "Local Product"}
                   </h4>

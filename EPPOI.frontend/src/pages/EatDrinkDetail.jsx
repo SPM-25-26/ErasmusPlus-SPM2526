@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
+const MEDIA_BASE_URL = 'https://eppoi.io'; 
 
 function EatDrinkDetail() {
   const { id } = useParams();
@@ -64,7 +65,6 @@ function EatDrinkDetail() {
               </span>
             )}
             
-            {/* Tutti i tag alimentari nel dettaglio */}
             {place.dietaryNeeds && place.dietaryNeeds.map((need, idx) => (
               <span key={idx} style={{ backgroundColor: '#1A3320', color: '#81C784', padding: '6px 14px', borderRadius: '20px', fontSize: '0.9rem' }}>
                 <i className="fas fa-leaf" style={{ marginRight: '6px' }}></i>{need}
@@ -85,7 +85,7 @@ function EatDrinkDetail() {
         </header>
 
         <img 
-          src={place.primaryImagePath ? `${API_BASE_URL}${place.primaryImagePath}` : 'https://images.unsplash.com/photo-1414235077428-338988a2e8c0?w=800&q=80'} 
+          src={place.primaryImagePath ? `${MEDIA_BASE_URL}${place.primaryImagePath}` : 'https://images.unsplash.com/photo-1414235077428-338988a2e8c0?w=800&q=80'} 
           alt={place.officialName} 
           style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '16px', marginBottom: '40px', boxShadow: '0 8px 20px rgba(0,0,0,0.6)' }} 
         />
@@ -96,7 +96,6 @@ function EatDrinkDetail() {
           </div>
         )}
 
-        {/* Sezione Contatti */}
         <section style={{ backgroundColor: '#1E1E1E', padding: '30px', borderRadius: '12px', border: '1px solid #333' }}>
           <h3 style={{ color: '#FFFFFF', fontSize: '1.5rem', marginBottom: '20px' }}>Contact Information</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#AAAAAA', fontSize: '1.05rem', lineHeight: '2' }}>
@@ -110,7 +109,6 @@ function EatDrinkDetail() {
               <li><i className="fas fa-globe" style={{ color: '#4DA8DA', width: '25px' }}></i> <a href={place.website} target="_blank" rel="noreferrer" style={{ color: '#4DA8DA', textDecoration: 'none' }}>Website</a></li>
             )}
             
-            {/* Social */}
             {(place.facebook || place.instagram) && (
               <li style={{ marginTop: '15px' }}>
                 {place.instagram && (
