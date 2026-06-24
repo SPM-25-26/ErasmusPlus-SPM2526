@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
+const MEDIA_BASE_URL = 'https://eppoi.io'; // Aggiunta costante media
 const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6';
 
 function ShoppingList() {
@@ -72,7 +73,7 @@ function ShoppingList() {
             transition: 'transform 0.2s'
           }}>
             <img 
-              src={shop.primaryImagePath ? `${API_BASE_URL}${shop.primaryImagePath}` : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80'} 
+              src={shop.primaryImagePath ? `${MEDIA_BASE_URL}${shop.primaryImagePath}` : 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80'} 
               alt={shop.officialName} 
               style={{ width: '100%', height: '220px', objectFit: 'cover' }} 
             />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
+const MEDIA_BASE_URL = 'https://eppoi.io'; // Aggiunta costante media
 
 function EventsDetail() {
   const { id } = useParams();
@@ -48,8 +49,11 @@ function EventsDetail() {
   if (error) return <div style={{ color: '#ef5350', textAlign: 'center', padding: '50px', fontSize: '1.2rem' }}>{error}</div>;
   if (!event) return null;
 
-  const displayImage = event.organizer?.primaryImagePath 
-    ? `${API_BASE_URL}${event.organizer.primaryImagePath}` 
+  // L'immagine può trovarsi nell'evento o (come fallback) nell'organizzatore
+  const displayImage = event.primaryImagePath
+    ? `${MEDIA_BASE_URL}${event.primaryImagePath}`
+    : event.organizer?.primaryImagePath 
+    ? `${MEDIA_BASE_URL}${event.organizer.primaryImagePath}` 
     : 'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=800&q=80';
 
   return (
@@ -107,7 +111,7 @@ function EventsDetail() {
           </section>
         )}
 
-        {}
+        {/* Sezione Offerte/Biglietti */}
         {event.offers && event.offers.length > 0 && (
           <section style={{ backgroundColor: '#2A2A2A', padding: '30px', borderRadius: '12px', border: '1px solid #4DA8DA' }}>
             <h3 style={{ color: '#FFFFFF', fontSize: '1.5rem', marginBottom: '20px' }}>Tickets & Offers</h3>

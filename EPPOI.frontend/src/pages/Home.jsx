@@ -8,13 +8,12 @@ function Home() {
     { title: "Eat & Drink", icon: "fa-utensils", path: "/EatDrinkList", desc: "Restaurants, bars, and local flavors" },
     { title: "Entertainment", icon: "fa-ticket-alt", path: "/EntertainmentList", desc: "Cinemas, theaters, and leisure activities" },
     { title: "Events", icon: "fa-calendar-check", path: "/EventsList", desc: "What to do in the city this week" },
-    { title: "Nature", icon: "fa-leaf", path: "/nature", desc: "Parks, reserves, and green areas" },
-    { title: "Map", icon: "fa-map-marked-alt", path: "/map", desc: "Explore the area interactively" },
+    { title: "Nature", icon: "fa-leaf", path: "/NatureList", desc: "Parks, reserves, and green areas" },
     { title: "Routes", icon: "fa-route", path: "/RoutesList", desc: "Tourist itineraries and trails" },
     { title: "Organizations", icon: "fa-sitemap", path: "/OrganizationsList", desc: "Institutions, associations, and services" },
     { title: "Sleep Accommodation", icon: "fa-hotel", path: "/SleepAccommodationList", desc: "Hotels, B&Bs, and welcoming places to stay" },
     { title: "Shopping", icon: "fa-shopping-bag", path: "/ShoppingList", desc: "Stores, boutiques, and local products" },
-    { title: "Map", icon: "fa-map-marked-alt", path: "/map", desc: "Explore the area interactively" }
+    { title: "Map", icon: "fa-map-marked-alt", path: "/map", desc: "Explore the area interactively" },
   ];
 
   return (

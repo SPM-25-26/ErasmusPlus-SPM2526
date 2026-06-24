@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
+const MEDIA_BASE_URL = 'https://eppoi.io'; // Aggiunta costante media
 
 function OrganizationsDetail() {
-  // L'id qui rappresenta il taxCode passato dalla lista
   const { id } = useParams();
   const [organization, setOrganization] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -77,7 +77,7 @@ function OrganizationsDetail() {
         </header>
 
         <img 
-          src={organization.primaryImagePath ? `${API_BASE_URL}${organization.primaryImagePath}` : 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80'} 
+          src={organization.primaryImagePath ? `${MEDIA_BASE_URL}${organization.primaryImagePath}` : 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80'} 
           alt={organization.legalName} 
           style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: '16px', marginBottom: '40px', boxShadow: '0 8px 20px rgba(0,0,0,0.6)' }} 
         />
@@ -88,10 +88,8 @@ function OrganizationsDetail() {
           </div>
         )}
 
-        {/* Box Contatti e Dettagli Legali */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
           
-          {/* Mostriamo la sezione contatti solo se c'è almeno un recapito */}
           {(organization.telephone || organization.email || organization.website || organization.instagram || organization.facebook) && (
             <section style={{ backgroundColor: '#1E1E1E', padding: '30px', borderRadius: '12px', border: '1px solid #333' }}>
               <h3 style={{ color: '#FFFFFF', fontSize: '1.5rem', marginBottom: '20px' }}>Contact Information</h3>
@@ -126,7 +124,6 @@ function OrganizationsDetail() {
           <section style={{ backgroundColor: '#1E1E1E', padding: '30px', borderRadius: '12px', border: '1px solid #333' }}>
             <h3 style={{ color: '#FFFFFF', fontSize: '1.5rem', marginBottom: '20px' }}>Company Details</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#AAAAAA', fontSize: '1.05rem', lineHeight: '2.2' }}>
-              {/* Qui usiamo esplicitamente taxCode in base al DTO */}
               <li><i className="fas fa-id-card" style={{ color: '#4DA8DA', width: '25px' }}></i> Tax Code: <strong>{organization.taxCode}</strong></li>
               {organization.legalStatus && (
                 <li><i className="fas fa-balance-scale" style={{ color: '#4DA8DA', width: '25px' }}></i> Status: <strong>{organization.legalStatus}</strong></li>

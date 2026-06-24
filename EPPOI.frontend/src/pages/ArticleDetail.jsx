@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097'; 
+const MEDIA_BASE_URL = 'https://eppoi.io';
 
 function ArticleDetail() {
   const { id } = useParams(); 
@@ -73,7 +74,7 @@ function ArticleDetail() {
         </header>
 
         <img 
-          src={article.imagePath ? `${API_BASE_URL}${article.imagePath}` : 'https://via.placeholder.com/800x400/1E1E1E/4DA8DA?text=No+Image'} 
+          src={article.imagePath ? `${MEDIA_BASE_URL}${article.imagePath}` : 'https://via.placeholder.com/800x400/1E1E1E/4DA8DA?text=No+Image'} 
           alt={article.title} 
           style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '16px', marginBottom: '40px', boxShadow: '0 8px 20px rgba(0,0,0,0.6)' }} 
         />
@@ -94,7 +95,7 @@ function ArticleDetail() {
             }}>
               {paragraph.referenceImagePath && (
                 <img 
-                  src={`${API_BASE_URL}${paragraph.referenceImagePath}`} 
+                  src={`${MEDIA_BASE_URL}${paragraph.referenceImagePath}`} 
                   alt={paragraph.title || 'POI'} 
                   style={{ width: '100%', height: '300px', objectFit: 'cover' }} 
                 />

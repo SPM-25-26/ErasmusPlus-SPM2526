@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
+const MEDIA_BASE_URL = 'https://eppoi.io'; // Aggiunta la base url per i media
 const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6';
 
 function EntertainmentList() {
@@ -73,7 +74,7 @@ function EntertainmentList() {
             transition: 'transform 0.2s'
           }}>
             <img 
-              src={place.primaryImagePath ? `${API_BASE_URL}${place.primaryImagePath}` : 'https://images.unsplash.com/photo-1511516284004-944208a0980d?w=800&q=80'} 
+              src={place.primaryImagePath ? `${MEDIA_BASE_URL}${place.primaryImagePath}` : 'https://images.unsplash.com/photo-1511516284004-944208a0980d?w=800&q=80'} 
               alt={place.officialName} 
               style={{ width: '100%', height: '220px', objectFit: 'cover' }} 
             />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
+const MEDIA_BASE_URL = 'https://eppoi.io'; // Aggiunta costante media
 
 function SleepAccommodationDetail() {
   const { id } = useParams();
@@ -91,7 +92,7 @@ function SleepAccommodationDetail() {
         </header>
 
         <img 
-          src={place.primaryImagePath ? `${API_BASE_URL}${place.primaryImagePath}` : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80'} 
+          src={place.primaryImagePath ? `${MEDIA_BASE_URL}${place.primaryImagePath}` : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80'} 
           alt={place.officialName} 
           style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '16px', marginBottom: '40px', boxShadow: '0 8px 20px rgba(0,0,0,0.6)' }} 
         />
