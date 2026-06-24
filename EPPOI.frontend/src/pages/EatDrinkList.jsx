@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
-const MEDIA_BASE_URL = 'https://eppoi.io'; // Aggiunta la base url per i media
+const MEDIA_BASE_URL = 'https://eppoi.io'; 
 const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6';
 
 function EatDrinkList() {
@@ -15,7 +15,6 @@ function EatDrinkList() {
       try {
         const token = localStorage.getItem('token'); 
 
-        // Rotta esatta dal controller: api/pois/eat-drink
         const response = await fetch(`${API_BASE_URL}/api/pois/eat-drink?municipalityId=${MUNICIPALITY_ID}`, {
           method: 'GET',
           headers: {
@@ -87,7 +86,6 @@ function EatDrinkList() {
                   </span>
                 )}
                 
-                {/* Mostriamo massimo 2 tag alimentari (dietaryNeeds) per non ingombrare la card */}
                 {place.dietaryNeeds && place.dietaryNeeds.slice(0, 2).map((need, idx) => ( 
                   <span key={idx} style={{ backgroundColor: '#1A3320', color: '#81C784', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem' }}>
                     {need}

@@ -43,7 +43,7 @@ function SleepAccommodationList() {
   const renderStars = (rating) => {
     if (!rating) return null;
     const parsedRating = parseFloat(rating);
-    if (isNaN(parsedRating)) return null; // Evita errori se la classificazione non contiene numeri
+    if (isNaN(parsedRating)) return null; 
     
     const numStars = Math.floor(parsedRating);
     return Array.from({ length: numStars }, (_, i) => (

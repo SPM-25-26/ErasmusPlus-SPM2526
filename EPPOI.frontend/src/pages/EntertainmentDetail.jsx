@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
-const MEDIA_BASE_URL = 'https://eppoi.io'; // Aggiunta la base url per i media
+const MEDIA_BASE_URL = 'https://eppoi.io'; 
 
 function EntertainmentDetail() {
   const { id } = useParams();
@@ -82,7 +82,6 @@ function EntertainmentDetail() {
           </div>
         )}
 
-        {/* Sezione Contatti Dinamica */}
         {(place.address || place.telephone || place.email || place.website) && (
           <section style={{ backgroundColor: '#1E1E1E', padding: '30px', borderRadius: '12px', border: '1px solid #333' }}>
             <h3 style={{ color: '#FFFFFF', fontSize: '1.5rem', marginBottom: '20px' }}>Visitor Information</h3>
@@ -101,7 +100,6 @@ function EntertainmentDetail() {
                 <li><i className="fas fa-globe" style={{ color: '#4DA8DA', width: '25px' }}></i> <a href={place.website} target="_blank" rel="noreferrer" style={{ color: '#4DA8DA', textDecoration: 'none' }}>Website</a></li>
               )}
               
-              {/* Social */}
               {(place.facebook || place.instagram) && (
                 <li style={{ marginTop: '15px' }}>
                   {place.instagram && (

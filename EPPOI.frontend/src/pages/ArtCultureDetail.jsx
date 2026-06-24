@@ -87,7 +87,6 @@ function ArtCultureDetail() {
           </div>
         )}
 
-        {/* Sezione Visitor Information dinamica */}
         {(place.address || place.telephone || place.email || place.website) && (
           <section style={{ backgroundColor: '#1E1E1E', padding: '30px', borderRadius: '12px', border: '1px solid #333' }}>
             <h3 style={{ color: '#FFFFFF', fontSize: '1.5rem', marginBottom: '20px' }}>Visitor Information</h3>
@@ -105,7 +104,6 @@ function ArtCultureDetail() {
                 <li><i className="fas fa-globe" style={{ color: '#4DA8DA', width: '25px' }}></i> <a href={place.website} target="_blank" rel="noreferrer" style={{ color: '#4DA8DA', textDecoration: 'none' }}>Website</a></li>
               )}
               
-              {/* Gestione dei Social Network se presenti */}
               {(place.facebook || place.instagram) && (
                 <li style={{ marginTop: '15px' }}>
                   {place.instagram && (

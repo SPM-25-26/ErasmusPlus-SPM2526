@@ -14,7 +14,6 @@ function NatureDetail() {
     const fetchNatureDetail = async () => {
       try {
         const token = localStorage.getItem('token');
-        // Usiamo lo stesso endpoint delle culture, tanto il DTO di dettaglio dovrebbe essere analogo
         const response = await fetch(`${API_BASE_URL}/api/pois/culture/${id}`, {
           method: 'GET',
           headers: {

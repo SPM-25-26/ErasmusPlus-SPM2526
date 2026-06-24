@@ -33,11 +33,10 @@ function Home() {
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(3, 1fr)', 
-        gap: '40px', // Spaziatura principale della griglia
+        gap: '40px', 
         width: '100%'
       }}>
         {categories.map((cat, index) => (
-          /* Abbiamo rimosso il div interno, ora il Link STESSO è la card */
           <Link to={cat.path} key={index} style={{ 
             textDecoration: 'none',
             backgroundColor: '#1E1E1E', 
@@ -50,7 +49,7 @@ function Home() {
             padding: '40px 20px',
             boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
             border: '1px solid #333',
-            marginBottom: '40px' // Rete di sicurezza per forzare lo spazio verticale
+            marginBottom: '40px' 
           }}>
             <div style={{ 
               fontSize: '2.5rem', 

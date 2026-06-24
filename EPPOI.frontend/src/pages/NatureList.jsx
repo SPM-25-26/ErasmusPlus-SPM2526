@@ -13,12 +13,10 @@ function NatureList() {
     const fetchNature = async () => {
       try {
         const token = localStorage.getItem('token');
-        // Usiamo lo stesso endpoint base delle culture, ma filtriamo diversamente
         const response = await fetch(`${API_BASE_URL}/api/pois/culture?municipalityId=${MUNICIPALITY_ID}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
-        // FILTRO: prendiamo solo Nature
         setPlaces(data.filter(p => p.artCultureNatureType === 'Nature'));
       } catch (err) {
         console.error(err);

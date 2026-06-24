@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
-const MEDIA_BASE_URL = 'https://eppoi.io'; // Aggiunta costante media
+const MEDIA_BASE_URL = 'https://eppoi.io'; 
 
 function EventsDetail() {
   const { id } = useParams();

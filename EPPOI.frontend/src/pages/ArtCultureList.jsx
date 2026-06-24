@@ -20,7 +20,6 @@ function ArtCultureList() {
 
         if (!response.ok) throw new Error("Errore API");
         const data = await response.json();
-        // FILTRO: prendiamo solo ArtCulture
         setPlaces(data.filter(p => p.artCultureNatureType === 'ArtCulture'));
       } catch (err) {
         setError("Impossibile caricare i luoghi.");

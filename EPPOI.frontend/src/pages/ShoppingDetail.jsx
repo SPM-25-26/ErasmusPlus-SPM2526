@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 const API_BASE_URL = 'https://localhost:7097';
-const MEDIA_BASE_URL = 'https://eppoi.io'; // Aggiunta costante media
+const MEDIA_BASE_URL = 'https://eppoi.io'; 
 
 function ShoppingDetail() {
   const { id } = useParams();
@@ -91,7 +91,6 @@ function ShoppingDetail() {
         )}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', marginBottom: '50px' }}>
-          {/* Sezione Info Negozio */}
           <section style={{ backgroundColor: '#1E1E1E', padding: '30px', borderRadius: '12px', border: '1px solid #333' }}>
             <h3 style={{ color: '#FFFFFF', fontSize: '1.5rem', marginBottom: '20px' }}>Store Information</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#AAAAAA', fontSize: '1.05rem', lineHeight: '2' }}>
@@ -123,7 +122,6 @@ function ShoppingDetail() {
           </section>
         </div>
 
-        {/* Prodotti Tipici */}
         {shop.typicalProducts && shop.typicalProducts.length > 0 && (
           <section style={{ backgroundColor: '#2A2A2A', padding: '30px', borderRadius: '12px', border: '1px solid #4DA8DA' }}>
             <h3 style={{ color: '#FFFFFF', fontSize: '1.8rem', marginBottom: '20px' }}>Typical Products</h3>
