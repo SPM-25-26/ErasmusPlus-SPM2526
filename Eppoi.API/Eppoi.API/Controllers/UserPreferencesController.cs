@@ -85,7 +85,8 @@ namespace Eppoi.API.Controllers
         public async Task<ActionResult<IEnumerable<RecommendedItemDto>>> GetPersonalizedFeed(
             [FromQuery] string municipalityId,
             [FromQuery] double? userLat = null,  
-            [FromQuery] double? userLong = null)
+            [FromQuery] double? userLong = null,
+            [FromQuery] string? category = null)
         {
             if (string.IsNullOrWhiteSpace(municipalityId))
                 return BadRequest(new { message = Consts.MunicipalityIdRequired });
@@ -105,7 +106,7 @@ namespace Eppoi.API.Controllers
                 .GroupBy(p => p.Category.ToLower())
                 .ToDictionary(g => g.Key, g => g.Max(p => p.Weight));
 
-            var rawCandidates = await RetrieveCandidatesAsync(targetMunicipalityId: municipalityId);
+            var rawCandidates = await RetrieveCandidatesAsync(targetMunicipalityId: municipalityId, categoryFilter: category);
             var recommendedItems = TranslateAndScoreCandidates(rawCandidates, prefsDict, userLat, userLong);
 
             if (recommendedItems.Count < Consts.MinFeedItems)
@@ -113,7 +114,7 @@ namespace Eppoi.API.Controllers
                 int missingCount = Consts.MinFeedItems - recommendedItems.Count;
                 _logger.LogInformation("Fallback triggered: Found only {Count} items. Fetching {Missing} more from other areas.", recommendedItems.Count, missingCount);
 
-                var fallbackRaw = await RetrieveCandidatesAsync(targetMunicipalityId: null, excludeMunicipalityId: municipalityId, limit: 150);
+                var fallbackRaw = await RetrieveCandidatesAsync(targetMunicipalityId: null, excludeMunicipalityId: municipalityId, categoryFilter: category, limit: 150);
 
                 var fallbackItems = TranslateAndScoreCandidates(fallbackRaw, prefsDict, userLat, userLong);
 
@@ -132,7 +133,11 @@ namespace Eppoi.API.Controllers
             return Ok(rankedFeed);
         }
 
-        private async Task<List<RawPoiCandidate>> RetrieveCandidatesAsync(string? targetMunicipalityId = null, string? excludeMunicipalityId = null, int? limit = null)
+        private async Task<List<RawPoiCandidate>> RetrieveCandidatesAsync(
+            string? targetMunicipalityId = null, 
+            string? excludeMunicipalityId = null,
+            string? categoryFilter = null,
+            int? limit = null)
         {
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
@@ -172,6 +177,14 @@ namespace Eppoi.API.Controllers
                                p.PoisSleep != null ? p.PoisSleep.Typology : null
                 })
                 .Where(raw => raw.EntityType != null);
+
+            if (!string.IsNullOrWhiteSpace(categoryFilter))
+            {
+                var lowerFilter = categoryFilter.ToLower();
+                projectedQuery = projectedQuery.Where(raw =>
+                    (raw.EntityType != null && raw.EntityType.ToLower() == lowerFilter) ||
+                    (raw.Category != null && raw.Category.ToLower() == lowerFilter));
+            }
 
             if (limit.HasValue)
                 projectedQuery = projectedQuery.Take(limit.Value);
