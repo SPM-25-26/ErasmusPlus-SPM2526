@@ -64,7 +64,13 @@ namespace Eppoi.API.Controllers
 
             if (existingPreferences.Count != 0)
                 _context.UserPreference.RemoveRange(existingPreferences);
-
+            ////
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                user.HasCompletedFirstLogin = true; // Questo sblocca lo status
+            }
+            ////
             var newPreferences = _mapper.Map<List<UserPreference>>(request.Preferences);
 
             foreach (var pref in newPreferences)

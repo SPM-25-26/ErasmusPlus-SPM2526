@@ -27,6 +27,7 @@ import ShoppingList from './pages/ShoppingList';
 import InteractiveMap from './pages/InteractiveMap'; 
 import NatureList from './pages/NatureList';
 import NatureDetail from './pages/NatureDetail';
+import Questionnaire from './pages/Questionnaire';
 
 function App() {
   return (
@@ -61,6 +62,8 @@ function App() {
         <Route path="/map" element={<InteractiveMap />} />
         <Route path="/NatureList" element={<NatureList />} />
         <Route path="/NatureDetail/:id" element={<NatureDetail />} />
+
+        <Route path="/questionnaire" element={<Questionnaire />} />
         
       </Routes>
     </BrowserRouter>
