@@ -85,7 +85,8 @@ namespace Eppoi.API.Controllers
         public async Task<ActionResult<IEnumerable<RecommendedItemDto>>> GetPersonalizedFeed(
             [FromQuery] string municipalityId,
             [FromQuery] double? userLat = null,  
-            [FromQuery] double? userLong = null)
+            [FromQuery] double? userLong = null,
+            [FromQuery] string? category = null)
         {
             if (string.IsNullOrWhiteSpace(municipalityId))
                 return BadRequest(new { message = Consts.MunicipalityIdRequired });
@@ -94,7 +95,7 @@ namespace Eppoi.API.Controllers
             if (!Guid.TryParse(userIdString, out var userId))
                 return Unauthorized(new { message = "Unauthorized access." });
 
-            _logger.LogInformation("Generating personalized feed for User: {UserId} in Municipality: {MunicipalityId}", userId, municipalityId);
+            _logger.LogInformation("Generating feed for User: {UserId}. Target Municipality: {MunicipalityId}", userId, municipalityId);
 
             var userPrefs = await _context.UserPreference
                 .AsNoTracking()
@@ -105,33 +106,58 @@ namespace Eppoi.API.Controllers
                 .GroupBy(p => p.Category.ToLower())
                 .ToDictionary(g => g.Key, g => g.Max(p => p.Weight));
 
-            var rawCandidates = await RetrieveCandidatesAsync(municipalityId);
-
+            var rawCandidates = await RetrieveCandidatesAsync(targetMunicipalityId: municipalityId, categoryFilter: category);
             var recommendedItems = TranslateAndScoreCandidates(rawCandidates, prefsDict, userLat, userLong);
+
+            if (recommendedItems.Count < Consts.MinFeedItems)
+            {
+                int missingCount = Consts.MinFeedItems - recommendedItems.Count;
+                _logger.LogInformation("Fallback triggered: Found only {Count} items. Fetching {Missing} more from other areas.", recommendedItems.Count, missingCount);
+
+                var fallbackRaw = await RetrieveCandidatesAsync(targetMunicipalityId: null, excludeMunicipalityId: municipalityId, categoryFilter: category, limit: 150);
+
+                var fallbackItems = TranslateAndScoreCandidates(fallbackRaw, prefsDict, userLat, userLong);
+
+                var topFallbackItems = fallbackItems
+                    .OrderByDescending(i => i.MatchScore)
+                    .Take(missingCount);
+
+                recommendedItems.AddRange(topFallbackItems);
+            }
 
             var rankedFeed = recommendedItems
                 .OrderByDescending(i => i.MatchScore)
                 .Take(50)
                 .ToList();
 
-            if (!userPrefs.Any())
-                _logger.LogInformation("No user preferences found for {UserId}. Returning generic sorted feed.", userId);
-
             return Ok(rankedFeed);
         }
 
-        private async Task<List<RawPoiCandidate>> RetrieveCandidatesAsync(string municipalityId)
+        private async Task<List<RawPoiCandidate>> RetrieveCandidatesAsync(
+            string? targetMunicipalityId = null, 
+            string? excludeMunicipalityId = null,
+            string? categoryFilter = null,
+            int? limit = null)
         {
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-            return await _context.Pois
-                .AsNoTracking()
-                .Where(p => p.MunicipalityId == municipalityId)
+            var query = _context.Pois.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(targetMunicipalityId))
+                query = query.Where(p => p.MunicipalityId == targetMunicipalityId);
+
+            if (!string.IsNullOrWhiteSpace(excludeMunicipalityId))
+                query = query.Where(p => p.MunicipalityId != excludeMunicipalityId);
+
+            var projectedQuery = query
                 .Where(p => p.PoisEvent == null || p.PoisEvent.EndDate >= today || (p.PoisEvent.EndDate == null && p.PoisEvent.StartDate >= today))
                 .Select(p => new RawPoiCandidate
                 {
                     Id = p.Id,
                     ImagePath = p.PrimaryImagePath,
+                    Address = p.Address,
+                    Latitude = p.Latitude,
+                    Longitude = p.Longitude,
 
                     EntityType = p.PoisEvent != null ? "Event" :
                                  p.PoisArtCultureNature != null ? "ArtCulture" :
@@ -141,9 +167,6 @@ namespace Eppoi.API.Controllers
                                  p.PoisSleep != null ? "Sleep" : null,
 
                     Title = p.PoisEvent != null ? p.PoisEvent.Title : p.OfficialName,
-                    Address = p.Address,
-                    Latitude = p.Latitude,   
-                    Longitude = p.Longitude,
                     EventDate = p.PoisEvent != null ? p.PoisEvent.StartDate : null,
 
                     Category = p.PoisEvent != null ? p.PoisEvent.Typology :
@@ -153,8 +176,20 @@ namespace Eppoi.API.Controllers
                                p.PoisEntertainmentLeisure != null ? p.PoisEntertainmentLeisure.Category :
                                p.PoisSleep != null ? p.PoisSleep.Typology : null
                 })
-                .Where(raw => raw.EntityType != null)
-                .ToListAsync();
+                .Where(raw => raw.EntityType != null);
+
+            if (!string.IsNullOrWhiteSpace(categoryFilter))
+            {
+                var lowerFilter = categoryFilter.ToLower();
+                projectedQuery = projectedQuery.Where(raw =>
+                    (raw.EntityType != null && raw.EntityType.ToLower() == lowerFilter) ||
+                    (raw.Category != null && raw.Category.ToLower() == lowerFilter));
+            }
+
+            if (limit.HasValue)
+                projectedQuery = projectedQuery.Take(limit.Value);
+
+            return await projectedQuery.ToListAsync();
         }
 
         private List<RecommendedItemDto> TranslateAndScoreCandidates(

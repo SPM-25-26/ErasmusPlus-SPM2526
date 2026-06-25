@@ -120,5 +120,7 @@
         // Recommendations Messages
         public const string RecommendationsRetrieved = "Personalized recommendations retrieved successfully.";
         public const string NoPreferencesFound = "No preferences found for the user. Returning generic popular content.";
+
+        public const int MinFeedItems = 20;
     }
 }
