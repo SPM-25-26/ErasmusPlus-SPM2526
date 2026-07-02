@@ -121,6 +121,10 @@
         public const string RecommendationsRetrieved = "Personalized recommendations retrieved successfully.";
         public const string NoPreferencesFound = "No preferences found for the user. Returning generic popular content.";
 
+        // Chatbot Messages
+        public const string ChatMessageRequired = "A message must be provided.";
+        public const string OutOfScopeRejection = "La richiesta non rientra nello scopo dell'app. Posso rispondere solo a domande sul turismo locale. Prova a chiedermi:\n- 'What are the main attractions in the city?'\n- 'Are there events this weekend?'\n- 'Museums near the city center'.";
+
         public const int MinFeedItems = 20;
     }
 }
