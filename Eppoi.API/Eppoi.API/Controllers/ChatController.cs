@@ -2,23 +2,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace Eppoi.API.Controllers
 {
-    [Authorize] 
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class ChatController : ControllerBase
+    public class ChatController(AppDbContext context, ILogger<ChatController> logger) : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly ILogger<ChatController> _logger;
-
-        public ChatController(AppDbContext context, ILogger<ChatController> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
+        private readonly AppDbContext _context = context;
+        private readonly ILogger<ChatController> _logger = logger;
 
         [HttpPost]
         public async Task<ActionResult<ChatResponseDto>> SendMessage([FromBody] ChatRequestDto request)
@@ -43,7 +38,7 @@ namespace Eppoi.API.Controllers
                 return Ok(new ChatResponseDto { Reply = Consts.OutOfScopeRejection });
             }
 
-            var retrievedContext = await RetrieveTourismDataAsync(request.MunicipalityId, request.Message);
+            var retrievedContext = await RetrieveTourismDataAsync(request.Message);
             var finalReply = GenerateContextualAnswer(request.Message, retrievedContext);
 
             return Ok(finalReply);
@@ -69,44 +64,38 @@ namespace Eppoi.API.Controllers
         }
 
         /// <summary>
-        /// Retrieves internal data from the database to prevent hallucinations and generic knowledge usage.
+        /// Esegue la query vettoriale sul DB chiamando la stored function 'match_app_data'.
         /// </summary>
-        private async Task<string> RetrieveTourismDataAsync(string municipalityId, string userMessage)
+        private async Task<string> RetrieveTourismDataAsync(string userMessage)
         {
-            var keywords = userMessage.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                                      .Where(w => w.Length > 3)
-                                      .ToList();
+            var queryEmbedding = await GenerateEmbeddingAsync(userMessage);
 
-            var query = _context.Pois
-                .AsNoTracking()
-                .Where(p => p.MunicipalityId == municipalityId);
+            var embeddingString = "[" + string.Join(",", queryEmbedding.Select(e => e.ToString(CultureInfo.InvariantCulture))) + "]";
 
-            if (keywords.Count != 0)
-            {
-                query = query.Where(p => keywords.Any(k =>
-                    (p.OfficialName != null && p.OfficialName.ToLower().Contains(k)) ||
-                    (p.Description != null && p.Description.ToLower().Contains(k)))
-                );
-            }
+            var relevantData = await _context.Database.SqlQueryRaw<MatchAppDataResultDTO>(
+                "SELECT id as Id, name as Name, description as Description, source_table as SourceTable, similarity as Similarity " +
+                "FROM match_app_data({0}::vector, {1}, {2})",
+                embeddingString, 0.2, 5
+            ).ToListAsync();
 
-            var relevantPois = await query.Take(5)
-                .Select(p => new
-                {
-                    p.OfficialName,
-                    p.Address,
-                    p.Description
-                })
-                .ToListAsync();
-
-            if (!relevantPois.Any())
+            if (relevantData.Count == 0)
                 return "Nessuna informazione specifica trovata nel database per questa richiesta.";
 
             var contextBuilder = new System.Text.StringBuilder();
-            foreach (var poi in relevantPois)
+            foreach (var item in relevantData)
             {
-                contextBuilder.AppendLine($"Nome: {poi.OfficialName}");
-                contextBuilder.AppendLine($"Indirizzo: {poi.Address}");
-                contextBuilder.AppendLine($"Descrizione: {poi.Description}");
+                string entityType = item.SourceTable?.ToLower() switch
+                {
+                    "organizations" => "Organizzazione/Ente",
+                    "routes" => "Itinerario",
+                    "pois" => "Punto di Interesse",
+                    "services" => "Servizio Turistico",
+                    "articles" => "Articolo",
+                    _ => "Informazione"
+                };
+
+                contextBuilder.AppendLine($"[{entityType}] Nome: {item.Name}");
+                contextBuilder.AppendLine($"Dettagli: {item.Description}");
                 contextBuilder.AppendLine("---");
             }
 
@@ -130,6 +119,16 @@ namespace Eppoi.API.Controllers
             {
                 Reply = $"Sulla base dei dati turistici ufficiali del comune, ecco le informazioni che ho trovato per te:\n\n{contextData}\nC'è altro che vorresti sapere sulle attrazioni locali?"
             };
+        }
+
+        /// <summary>
+        /// Mock per la generazione di embedding.
+        /// </summary>
+        private Task<double[]> GenerateEmbeddingAsync(string text)
+        {
+            var mockVector = new double[768];
+            Array.Fill(mockVector, 0.015);
+            return Task.FromResult(mockVector);
         }
     }
 }
