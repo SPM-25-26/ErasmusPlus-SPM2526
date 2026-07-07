@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 function Login() {
   // 1. Ho rinominato la variabile per renderla coerente con il backend
@@ -14,7 +15,7 @@ function Login() {
     setError('');
 
     try {
-      const response = await fetch('https://localhost:7097/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

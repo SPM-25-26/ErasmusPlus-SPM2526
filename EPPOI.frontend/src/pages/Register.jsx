@@ -60,13 +60,11 @@ function Register() {
       return;
     }
 
-    // Se superiamo i controlli locali, puliamo l'interfaccia e chiamiamo l'API
     setErrore('');
 
     // --- CHIAMATA API AL BACKEND .NET ---
     try {
-      // RICORDATI: Sostituisci PORTA_BACKEND con il numero trovato nel passo 1
-      const response = await fetch('http://localhost:5246/api/auth/register', {
+      const response = await fetch(`http://localhost:5246/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +83,6 @@ function Register() {
         // Status 201 Created -> Successo!
         navigate('/verify-email');
       } else {
-        // Errore restituito dal backend (es. email già presente)
         const errorData = await response.json();
         setErrore(errorData.message || "Errore durante la registrazione. Riprova.");
       }

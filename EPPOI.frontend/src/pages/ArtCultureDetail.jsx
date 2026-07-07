@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
-const API_BASE_URL = 'https://localhost:7097';
+
 const MEDIA_BASE_URL = 'https://eppoi.io';
 
 function ArtCultureDetail() {

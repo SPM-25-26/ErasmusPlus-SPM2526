@@ -101,3 +101,18 @@ body {
 .auth-links a:hover {
   text-decoration: underline;
 }
+
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.map-page-override {
+  display: block !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+}
+
+body.map-page-body {
+  display: block !important;
+}

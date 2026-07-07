@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const API_BASE_URL = 'https://localhost:7097';
+import { API_BASE_URL } from '../config';
 
 function Questionnaire() {
   const navigate = useNavigate();
