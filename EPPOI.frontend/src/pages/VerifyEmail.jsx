@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 function VerifyEmail() {
   // 1. Catturiamo il token dall'URL (es: ?token=eyJhbGci...)
@@ -17,7 +18,7 @@ function VerifyEmail() {
       const verifyToken = async () => {
         try {
           // Facciamo la GET all'URL esatto indicato dal tuo compagno
-          const response = await fetch(`https://localhost:7097/api/auth/verify-email?token=${token}`, {
+          const response = await fetch(`${API_BASE_URL}/api/auth/verify-email?token=${token}`, {
             method: 'GET',
             headers: {
               'Accept': 'text/html' // Richiesto dal documento

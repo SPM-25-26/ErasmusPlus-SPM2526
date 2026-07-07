@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 function ForgotPassword() {
   // 1. Definiamo gli stati per l'input, il messaggio di successo, l'errore e il caricamento
@@ -16,7 +17,7 @@ function ForgotPassword() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://localhost:7097/api/auth/forgot-password', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

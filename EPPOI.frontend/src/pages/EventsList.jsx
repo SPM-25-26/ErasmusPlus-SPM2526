@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
-const API_BASE_URL = 'https://localhost:7097'; 
 const MEDIA_BASE_URL = 'https://eppoi.io'; 
 const MUNICIPALITY_ID = '6c44abbd-72f1-4906-b22a-467cc97cf7b6'; 
 
