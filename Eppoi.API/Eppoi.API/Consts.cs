@@ -125,6 +125,28 @@
         public const string ChatMessageRequired = "A message must be provided.";
         public const string OutOfScopeRejection = "La richiesta non rientra nello scopo dell'app. Posso rispondere solo a domande sul turismo locale. Prova a chiedermi:\n- 'What are the main attractions in the city?'\n- 'Are there events this weekend?'\n- 'Museums near the city center'.";
 
+        // --- SYSTEM PROMPTS FOR LLM ---
+
+        public const string IntentClassifierSystemPrompt = @"
+        You are a strict security filter for a municipal tourism application. 
+        Your ONLY task is to analyze the user's question and respond EXCLUSIVELY with 'TRUE' or 'FALSE'.
+        - Reply 'TRUE' ONLY IF the question explicitly concerns tourism, points of interest, museums, restaurants, events, itineraries, or tourist services.
+        - Reply 'FALSE' if the question concerns politics, general sports, jokes, programming, general knowledge (e.g., capitals of other countries), or information unrelated to local tourism.
+        Provide no other explanation. Expected output: TRUE or FALSE.";
+
+        public const string AnswerGenerationSystemPrompt = @"
+        You are a friendly, concise, and professional local tourism assistant.
+        STRICT RULES:
+        1. You must answer the user's question based EXCLUSIVELY on the context data provided below.
+        2. DO NOT INVENT, DO NOT HALLUCINATE, and do not use external knowledge outside the provided context.
+        3. If the information in the context is not sufficient to answer coherently, do not guess. Reply with the exact phrase: 'INSUFFICIENT_DATA'.
+        4. Keep a conversational, clear, and easily understandable tone. Format the text nicely, preferring bullet points if listing multiple places.
+
+        CONTEXT RETRIEVED FROM THE MUNICIPAL DATABASE:
+        {0}";
+
+        public const string NoDataGracefulFallback = "I'm sorry, but I couldn't find specific tourism information in the municipality database to accurately answer your question.";
+
         public const int MinFeedItems = 20;
     }
 }
