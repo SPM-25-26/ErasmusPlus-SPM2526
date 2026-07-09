@@ -91,9 +91,20 @@ function Home() {
   return (
     <div style={{ padding: '40px 20px', maxWidth: '1350px', margin: '0 auto', position: 'relative' }}>
       
-      <button onClick={() => navigate('/questionnaire')} style={{ position: 'absolute', top: '40px', right: '20px', backgroundColor: '#1E1E1E', border: '1px solid #333', color: '#4DA8DA', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer' }}>
-        <i className="fas fa-sliders-h"></i> Interessi
-      </button>
+      {/* CONTENITORE PULSANTI DI CONTROLLO IN ALTO A DESTRA */}
+      <div style={{ position: 'absolute', top: '40px', right: '20px', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-end', zIndex: 10 }}>
+        
+        {/* PULSANTE INTERESSI */}
+        <button onClick={() => navigate('/questionnaire')} style={{ backgroundColor: '#1E1E1E', border: '1px solid #333', color: '#4DA8DA', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', width: 'auto' }}>
+          <i className="fas fa-sliders-h"></i> Interessi
+        </button>
+
+        {/* PULSANTE CHATBOT INNESTATO SOTTO CON ICONA */}
+        <button onClick={() => navigate('/chatbot')} style={{ backgroundColor: '#1E1E1E', border: '1px solid #333', color: '#4DA8DA', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', width: 'auto' }}>
+          <i className="fas fa-comments"></i> Chatbot
+        </button>
+
+      </div>
 
       <header style={{ marginBottom: '50px', textAlign: 'center' }}>
         <h1 style={{ color: 'white' }}>Welcome to Eppoi</h1>

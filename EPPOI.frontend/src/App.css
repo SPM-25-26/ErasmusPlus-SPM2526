@@ -184,3 +184,46 @@
 }
 
 
+.chatbot-top-btn i {
+  font-size: 1rem;
+}
+
+.chatbot-top-btn:hover {
+  background-color: #252525;
+  transform: translateY(-1px);
+}
+
+.chatbot-sidebar-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(77, 168, 218, 0.3);
+}
+
+.chatbot-card-icon {
+  background-color: rgba(255, 255, 255, 0.1);
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chatbot-card-icon i {
+  color: #fff;
+  font-size: 1.4rem; /* Icona grande e ben visibile */
+}
+
+.chatbot-card-content h4 {
+  color: #fff;
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.chatbot-card-content p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+
