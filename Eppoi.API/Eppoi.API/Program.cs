@@ -115,6 +115,8 @@ namespace Eppoi.API
                         .AllowAnyMethod());
                 });
 
+                builder.Services.AddHttpClient();
+
                 var app = builder.Build();
 
                 app.UseCors();
