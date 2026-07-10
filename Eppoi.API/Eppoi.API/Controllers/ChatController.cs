@@ -14,7 +14,7 @@ namespace Eppoi.API.Controllers
     public class ChatController(
         AppDbContext context,
         ILogger<ChatController> logger,
-        GeminiHelper geminiHelper) : ControllerBase // Usiamo direttamente il loro helper
+        GeminiHelper geminiHelper) : ControllerBase 
     {
         private readonly AppDbContext _context = context;
         private readonly ILogger<ChatController> _logger = logger;
@@ -32,7 +32,6 @@ namespace Eppoi.API.Controllers
 
             try
             {
-                // STEP 1: Embedding usando ESATTAMENTE il loro metodo (che forza 768 dim)
                 var embeddingResponse = await _geminiHelper.GenerateEmbeddingAsync(
                     request.Message,
                     "RETRIEVAL_QUERY",
@@ -45,7 +44,6 @@ namespace Eppoi.API.Controllers
                 var queryEmbedding = embeddingResponse.Embedding.Values;
                 var embeddingString = "[" + string.Join(",", queryEmbedding.Select(e => e.ToString(CultureInfo.InvariantCulture))) + "]";
 
-                // STEP 2: Ricerca RAG sicura (Query diretta per evitare errori di SP)
                 var relevantData = await _context.Database.SqlQueryRaw<MatchAppDataResultDTO>(
                     "SELECT id as Id, \"officialName\" as Name, description as Description, 'pois' as SourceTable, 1 - (embedding <=> {0}::vector) as Similarity " +
                     "FROM pois " +
@@ -61,13 +59,11 @@ namespace Eppoi.API.Controllers
                     contextText.AppendLine($"[Point of Interest] Name: {item.Name} | Details: {item.Description}");
                 }
 
-                // STEP 3: Generazione risposta usando ESATTAMENTE il loro metodo
                 string systemRules = string.Format(Consts.UnifiedChatbotSystemPrompt, contextText.ToString());
                 var generationResponse = await _geminiHelper.GenerateContentAsync($"{systemRules}\n\nUSER QUESTION:\n{request.Message}");
 
                 var answer = generationResponse?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text ?? string.Empty;
 
-                // Gestione Guardrails
                 if (answer.Trim().Equals("OUT_OF_SCOPE", StringComparison.OrdinalIgnoreCase))
                     return Ok(new ChatResponseDto { Reply = Consts.OutOfScopeRejection });
 
