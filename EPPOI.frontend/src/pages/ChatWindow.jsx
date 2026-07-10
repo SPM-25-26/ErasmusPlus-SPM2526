@@ -95,81 +95,102 @@ export default function ChatWindow() {
   };
 
   return (
-    <div className="chat-container">
-      <div className="chat-header">
-        <h3>Assistente Turistico - Eppoi</h3>
-      </div>
+    <div className="chat-page-wrapper" style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
       
-      <div className="chat-messages">
-        {messages.map((msg) => (
-          <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
-            <div className="message-bubble">
-              <p style={{ margin: 0 }}>{msg.text}</p>
-              
-              {/* TASK 1: RENDERING DELLE CARD SE PRESENTI NEL MESSAGGIO DEL BOT */}
-              {msg.relatedData && msg.relatedData.length > 0 && (
-                <div className="bot-cards-container" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {msg.relatedData.map((item) => {
-                    const detailPath = item.entityType === 'Sleep' 
-                      ? `/SleepAccommodationDetail/${item.id}` 
-                      : `/${item.entityType}Detail/${item.id}`;
+      {/* Tasto Back to Home modificato: reindirizza esplicitamente alla pagina /home protetta */}
+      <Link 
+        to="/home" 
+        className="back-to-home" 
+        style={{ 
+          color: '#4DA8DA', 
+          textDecoration: 'none', 
+          fontSize: '0.9rem', 
+          fontWeight: '500',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '5px',
+          marginBottom: '20px'
+        }}
+      >
+        ← Back to Home
+      </Link>
 
-                    return (
-                      <Link 
-                        to={detailPath} 
-                        key={item.id} 
-                        className="bot-data-card"
-                        style={{ textDecoration: 'none', display: 'flex', gap: '10px', padding: '10px', backgroundColor: '#252525', borderRadius: '8px', border: '1px solid #333' }}
-                      >
-                        <img 
-                          src={item.imagePath ? `https://eppoi.io${item.imagePath}` : "https://via.placeholder.com/50"} 
-                          style={{ width: '50px', height: '50px', borderRadius: '4px', objectFit: 'cover' }} 
-                          alt={item.title} 
-                        />
-                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                          <h5 style={{ color: 'white', margin: 0, fontSize: '0.85rem', fontWeight: '600' }}>{item.title}</h5>
-                          <span style={{ color: '#4DA8DA', fontSize: '0.7rem' }}>Visualizza dettaglio →</span>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* TASK 2: SE IL MESSAGGIO È SEGNALATO COME ERRORE */}
-              {msg.isError && (
-                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px', color: '#EF5350', fontSize: '0.8rem' }}>
-                  <span>⚠️ Connessione locale non disponibile.</span>
-                </div>
-              )}
-
-              <span className="message-time">
-                {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-          </div>
-        ))}
+      <div className="chat-container">
+        <div className="chat-header">
+          <h3>Assistente Turistico - Eppoi</h3>
+        </div>
         
-        {/* Stato di caricamento "Bot is typing" */}
-        {isTyping && (
-          <div className="message-wrapper bot">
-            <div className="message-bubble typing">
-              <span>.</span><span>.</span><span>.</span>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+        <div className="chat-messages">
+          {messages.map((msg) => (
+            <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
+              <div className="message-bubble">
+                <p style={{ margin: 0 }}>{msg.text}</p>
+                
+                {/* TASK 1: RENDERING DELLE CARD SE PRESENTI NEL MESSAGGIO DEL BOT */}
+                {msg.relatedData && msg.relatedData.length > 0 && (
+                  <div className="bot-cards-container" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {msg.relatedData.map((item) => {
+                      const detailPath = item.entityType === 'Sleep' 
+                        ? `/SleepAccommodationDetail/${item.id}` 
+                        : `/${item.entityType}Detail/${item.id}`;
 
-      <form className="chat-input-area" onSubmit={handleSendMessage}>
-        <input
-          type="text"
-          placeholder="Chiedi informazioni sul comune..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
-        <button type="submit">Invia</button>
-      </form>
+                      return (
+                        <Link 
+                          to={detailPath} 
+                          key={item.id} 
+                          className="bot-data-card"
+                          style={{ textDecoration: 'none', display: 'flex', gap: '10px', padding: '10px', backgroundColor: '#252525', borderRadius: '8px', border: '1px solid #333' }}
+                        >
+                          <img 
+                            src={item.imagePath ? `https://eppoi.io${item.imagePath}` : "https://via.placeholder.com/50"} 
+                            style={{ width: '50px', height: '50px', borderRadius: '4px', objectFit: 'cover' }} 
+                            alt={item.title} 
+                        />
+                          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                            <h5 style={{ color: 'white', margin: 0, fontSize: '0.85rem', fontWeight: '600' }}>{item.title}</h5>
+                            <span style={{ color: '#4DA8DA', fontSize: '0.7rem' }}>Visualizza dettaglio →</span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* TASK 2: SE IL MESSAGGIO È SEGNALATO COME ERRORE */}
+                {msg.isError && (
+                  <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px', color: '#EF5350', fontSize: '0.8rem' }}>
+                    <span>⚠️ Connessione locale non disponibile.</span>
+                  </div>
+                )}
+
+                <span className="message-time">
+                  {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            </div>
+          ))}
+          
+          {/* Stato di caricamento "Bot is typing" */}
+          {isTyping && (
+            <div className="message-wrapper bot">
+              <div className="message-bubble typing">
+                <span>.</span><span>.</span><span>.</span>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <form className="chat-input-area" onSubmit={handleSendMessage}>
+          <input
+            type="text"
+            placeholder="Chiedi informazioni sul comune..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+          <button type="submit">Invia</button>
+        </form>
+      </div>
     </div>
   );
 }
