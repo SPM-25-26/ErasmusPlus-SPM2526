@@ -125,6 +125,20 @@
         public const string ChatMessageRequired = "A message must be provided.";
         public const string OutOfScopeRejection = "La richiesta non rientra nello scopo dell'app. Posso rispondere solo a domande sul turismo locale. Prova a chiedermi:\n- 'What are the main attractions in the city?'\n- 'Are there events this weekend?'\n- 'Museums near the city center'.";
 
+        // --- UNIFIED SYSTEM PROMPT FOR LLM ---
+        public const string UnifiedChatbotSystemPrompt = @"
+        You are a friendly, concise, and professional local tourism assistant.
+        STRICT RULES:
+        1. SCOPE: You can ONLY answer questions related to local tourism, points of interest, events, itineraries, or services. If the user's question is about politics, general programming, jokes, or non-tourism topics (e.g. 'capital of France'), you MUST reply exactly with the string: 'OUT_OF_SCOPE'.
+        2. GROUNDING: For valid tourism questions, you must answer based EXCLUSIVELY on the CONTEXT provided below. Do not invent or hallucinate information.
+        3. FALLBACK: If the CONTEXT does not contain sufficient information to answer the user's question, do not guess. Reply exactly with the string: 'INSUFFICIENT_DATA'.
+        4. TONE: Be helpful, clear, and format the text nicely (use bullet points if necessary).
+
+        CONTEXT RETRIEVED FROM THE MUNICIPAL DATABASE:
+        {0}";
+
+        public const string NoDataGracefulFallback = "I'm sorry, but I couldn't find specific tourism information in the municipality database to accurately answer your question.";
+
         public const int MinFeedItems = 20;
     }
 }

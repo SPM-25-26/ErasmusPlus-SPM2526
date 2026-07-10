@@ -115,6 +115,12 @@ namespace Eppoi.API
                         .AllowAnyMethod());
                 });
 
+                builder.Services.Configure<GeminiEnvSettings>(builder.Configuration.GetSection("Gemini"));
+                builder.Services.AddHttpClient<GeminiHelper>();
+                builder.Services.AddScoped<GeminiHelper>();
+
+                builder.Services.AddHttpClient();
+
                 var app = builder.Build();
 
                 app.UseCors();
