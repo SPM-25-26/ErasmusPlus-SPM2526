@@ -27,7 +27,7 @@ namespace Eppoi.API.Controllers
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!Guid.TryParse(userIdString, out var userId))
-                return Unauthorized(new { message = "Unauthorized access." });
+                return Unauthorized(new { message = "Unauthorized Access." });
 
             if (string.IsNullOrWhiteSpace(request.Message))
             try

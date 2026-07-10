@@ -1,0 +1,142 @@
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 75vh;
+    background-color: var(--social-bg); /* Sfondo scuro coerente con l'app */
+    border: 1px solid var(--border);     /* Bordo ufficiale di Eppoi */
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 650px;
+    margin: 20px auto;
+    box-shadow: var(--shadow);
+  }
+  
+  .chat-header {
+    background: var(--accent-bg);        /* Sfondo risaltato per l'header */
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+  
+  .chat-header h3 {
+    color: var(--text-h);                /* Colore del testo in evidenza */
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background-color: rgba(0, 0, 0, 0.2); /* Sfondo leggermente più scuro per i messaggi */
+  }
+  
+  .message-wrapper {
+    display: flex;
+    width: 100%;
+  }
+  
+  .message-wrapper.user {
+    justify-content: flex-end;
+  }
+  
+  .message-wrapper.bot {
+    justify-content: flex-start;
+  }
+  
+  .message-bubble {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    color: var(--text-h);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Bolla dell'utente (Stile bottone/accento di Eppoi) */
+  .user .message-bubble {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    border-bottom-right-radius: 2px;
+  }
+  
+  /* Bolla del Bot (Stile blocco neutro scuro) */
+  .bot .message-bubble {
+    background-color: var(--social-bg);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 2px;
+  }
+  
+  .message-time {
+    display: block;
+    font-size: 11px;
+    color: #8e8e93;
+    margin-top: 6px;
+    text-align: right;
+  }
+  
+  /* Area di input in fondo alla chat */
+  .chat-input-area {
+    display: flex;
+    padding: 16px;
+    background-color: var(--social-bg);
+    border-top: 1px solid var(--border);
+    gap: 12px;
+  }
+  
+  .chat-input-area input {
+    flex: 1;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 6px;
+    color: var(--text-h);
+    font-size: 14px;
+    transition: border-color 0.3s;
+  }
+  
+  .chat-input-area input:focus {
+    outline: none;
+    border-color: var(--accent-border);
+  }
+  
+  /* Bottone Invia coordinato con la classe .counter di Eppoi */
+  .chat-input-area button {
+    font-size: 14px;
+    padding: 0 20px;
+    border-radius: 6px;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    cursor: pointer;
+    transition: background 0.3s, transform 0.1s;
+  }
+  
+  .chat-input-area button:hover {
+    background: var(--border);
+  }
+  
+  .chat-input-area button:active {
+    transform: scale(0.98);
+  }
+  
+  /* Animazione tre pallini del caricamento ("is typing") */
+  .typing span {
+    animation: blink 1.4s infinite both;
+    font-weight: bold;
+    display: inline-block;
+    font-size: 18px;
+    color: var(--accent);
+  }
+  .typing span:nth-child(2) { animation-delay: .2s; }
+  .typing span:nth-child(3) { animation-delay: .4s; }
+  
+  @keyframes blink {
+    0% { opacity: .2; }
+    20% { opacity: 1; }
+    100% { opacity: .2; }
+  }

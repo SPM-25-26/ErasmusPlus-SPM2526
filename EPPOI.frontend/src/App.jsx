@@ -28,6 +28,7 @@ import InteractiveMap from './pages/InteractiveMap';
 import NatureList from './pages/NatureList';
 import NatureDetail from './pages/NatureDetail';
 import Questionnaire from './pages/Questionnaire';
+import Chatbot from './pages/Chatbot';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/ArticlesList" element={<ArticlesList />} />
         <Route path="/ArticleDetail/:id" element={<ArticleDetail />} />
         <Route path="/ArtCultureList" element={<ArtCultureList />} />
