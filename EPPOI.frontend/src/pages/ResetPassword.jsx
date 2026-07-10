@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 function ResetPassword() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errore, setErrore] = useState('');
   const [successo, setSuccesso] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Controllo robustezza password (le stesse regole della registrazione)
     const haMaiuscola = /[A-Z]/.test(password);
     const haNumero = /[0-9]/.test(password);
     const haSpeciale = /[!@#$%^&*(),.?":{}|<>]/.test(password);
@@ -22,20 +24,52 @@ function ResetPassword() {
       return;
     }
 
-    // 2. Controllo di corrispondenza tra i due campi
     if (password !== confirmPassword) {
       setErrore("Le password inserite non corrispondono.");
       return;
     }
 
-    // Se i controlli passano
-    setErrore('');
-    setSuccesso(true);
+    const token = searchParams.get('token');
 
-    // Simuliamo un reindirizzamento al login dopo 3 secondi dal successo
-    setTimeout(() => {
-      navigate('/login');
-    }, 3000);
+    if (!token) {
+      setErrore("Link non valido o scaduto. Usa il link completo che hai ricevuto per email.");
+      return;
+    }
+
+    setErrore('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          token: token, 
+          newPassword: password 
+        })
+      });
+
+      if (response.ok) {
+        setSuccesso(true);
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
+      } else {
+        const errorData = await response.json();
+        
+        if (errorData.message) {
+          setErrore(errorData.message);
+        } else if (Array.isArray(errorData)) {
+          setErrore(errorData[0].ErrorMessage || "La password non rispetta i criteri di sicurezza.");
+        } else {
+          setErrore("Si è verificato un errore durante il reset. Riprova.");
+        }
+      }
+    } catch (err) {
+      setErrore("Impossibile connettersi al server. Verifica la tua connessione.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,37 +88,39 @@ function ResetPassword() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Nuova Password</label>
-          <input 
-            type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••" 
-            required 
-            disabled={successo}
-          />
-        </div>
+      {!successo && (
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Nuova Password</label>
+            <input 
+              type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••" 
+              required 
+              disabled={isLoading}
+            />
+          </div>
 
-        <div className="form-group">
-          <label>Conferma Nuova Password</label>
-          <input 
-            type="password" 
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="••••••••" 
-            required 
-            disabled={successo}
-          />
-        </div>
+          <div className="form-group">
+            <label>Conferma Nuova Password</label>
+            <input 
+              type="password" 
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••" 
+              required 
+              disabled={isLoading}
+            />
+          </div>
 
-        <button type="submit" className="btn-primary" disabled={successo}>
-          Reimposta Password
-        </button>
-      </form>
+          <button type="submit" className="btn-primary" disabled={isLoading}>
+            {isLoading ? "Salvataggio in corso..." : "Reimposta Password"}
+          </button>
+        </form>
+      )}
       
-      <div className="auth-links">
+      <div className="auth-links" style={{ marginTop: '20px' }}>
         <Link to="/login">Torna al Login</Link>
       </div>
     </div>
