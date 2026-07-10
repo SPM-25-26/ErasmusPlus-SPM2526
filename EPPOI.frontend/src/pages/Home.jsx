@@ -1,76 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config';
-
 
 const MEDIA_BASE_URL = 'https://eppoi.io';
 
 function Home() {
   const navigate = useNavigate();
   const [isChecking, setIsChecking] = useState(true);
+  const [events, setEvents] = useState([]); 
   
-  const [allFilteredEvents, setAllFilteredEvents] = useState([]);
-  const [displayedEvents, setDisplayedEvents] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(10);
-  const [loadingMore, setLoadingMore] = useState(false);
-  
-  const scrollContainerRef = useRef(null);
-
   useEffect(() => {
     const initPage = async () => {
       const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
+      if (!token) { navigate('/login'); return; }
       try {
-        const statusRes = await fetch(`${API_BASE_URL}/api/UserPreferences/status`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const statusRes = await fetch(`${API_BASE_URL}/api/UserPreferences/status`, { headers: { 'Authorization': `Bearer ${token}` } });
         const statusData = await statusRes.json();
+        if (!statusData.hasCompleted) { navigate('/questionnaire'); return; }
 
-        if (!statusData.hasCompleted) {
-          navigate('/questionnaire');
-          return;
-        }
-
-        const feedRes = await fetch(`${API_BASE_URL}/api/UserPreferences/discover?municipalityId=6c44abbd-72f1-4906-b22a-467cc97cf7b6`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const feedRes = await fetch(`${API_BASE_URL}/api/UserPreferences/discover?municipalityId=6c44abbd-72f1-4906-b22a-467cc97cf7b6`, { headers: { 'Authorization': `Bearer ${token}` } });
         const dbData = await feedRes.json();
-        console.log("Totale elementi dal backend:", dbData.length); 
-        setAllFilteredEvents(dbData);
-        setDisplayedEvents(dbData.slice(0, visibleCount));
+        
+        setEvents(dbData);
         setIsChecking(false);
-      } catch (error) {
-        console.error("Errore:", error);
-        setIsChecking(false);
+      } catch (error) { 
+        console.error("Errore:", error); 
+        setIsChecking(false); 
       }
     };
-
     initPage();
   }, [navigate]);
-
-  const loadMoreItems = () => {
-    if (loadingMore || displayedEvents.length >= allFilteredEvents.length) return;
-    
-    setLoadingMore(true);
-    
-    const nextCount = visibleCount + 4;
-    setVisibleCount(nextCount);
-    
-    setDisplayedEvents(allFilteredEvents.slice(0, nextCount));
-    
-    setLoadingMore(false);
-  };
-
-  const handleScroll = (e) => {
-    const container = e.currentTarget;
-    if (container.scrollHeight - container.scrollTop <= container.clientHeight + 50) {
-      loadMoreItems();
-    }
-  };
 
   const categories = [
     { title: "Articles", icon: "fa-newspaper", path: "/ArticlesList", desc: "News and updates" },
@@ -82,81 +41,168 @@ function Home() {
     { title: "Routes", icon: "fa-route", path: "/RoutesList", desc: "Itineraries" },
     { title: "Organizations", icon: "fa-sitemap", path: "/OrganizationsList", desc: "Services" },
     { title: "Sleep Accommodation", icon: "fa-hotel", path: "/SleepAccommodationList", desc: "Where to stay" },
-    { title: "Shopping", icon: "fa-shopping-bag", path: "/ShoppingList", desc: "Local products" },
-    { title: "Map", icon: "fa-map-marked-alt", path: "/map", desc: "Interactive map" }
+    { title: "Shopping", icon: "fa-shopping-bag", path: "/ShoppingList", desc: "Local products" }
   ];
 
   if (isChecking) return <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white' }}>Verifica autorizzazioni...</div>;
 
   return (
-    <div style={{ padding: '40px 20px', maxWidth: '1350px', margin: '0 auto', position: 'relative' }}>
+    <div style={{ padding: '40px 5%', margin: '0 auto', fontFamily: 'inherit', maxWidth: '1600px' }}>
       
-      <button onClick={() => navigate('/questionnaire')} style={{ position: 'absolute', top: '40px', right: '20px', backgroundColor: '#1E1E1E', border: '1px solid #333', color: '#4DA8DA', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer' }}>
-        <i className="fas fa-sliders-h"></i> Interessi
-      </button>
+      {/* HEADER DASHBOARD */}
+      <header style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-end', 
+        marginBottom: '50px',
+        borderBottom: '1px solid #333',
+        paddingBottom: '20px',
+        flexWrap: 'wrap',
+        gap: '20px'
+      }}>
+        <div>
+          <h1 style={{ color: 'white', margin: '0 0 10px 0', fontSize: '2.5rem', letterSpacing: '-0.5px' }}>Welcome to Eppoi</h1>
+          <p style={{ color: '#aaa', margin: 0, fontSize: '1.1rem' }}>Esplora, scopri e vivi il tuo territorio</p>
+        </div>
 
-      <header style={{ marginBottom: '50px', textAlign: 'center' }}>
-        <h1 style={{ color: 'white' }}>Welcome to Eppoi</h1>
+        {/* BARRA AZIONI RAPIDE */}
+        <div style={{ display: 'flex', gap: '15px' }}>
+          {[
+            { label: "Mappa", path: "/map", icon: "fa-map-marked-alt" },
+            { label: "Interessi", path: "/questionnaire", icon: "fa-sliders-h" },
+            { label: "Chatbot", path: "/chatbot", icon: "fa-comments" }
+          ].map((item) => (
+            <button 
+              key={item.label} 
+              onClick={() => navigate(item.path)} 
+              style={{ 
+                backgroundColor: '#1E1E1E', 
+                border: '1px solid #333', 
+                color: '#4DA8DA', 
+                padding: '12px 24px', 
+                borderRadius: '12px', 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '10px', 
+                fontWeight: '600',
+                fontSize: '1rem',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.borderColor = '#4DA8DA'; e.currentTarget.style.backgroundColor = '#252525'; }}
+              onMouseOut={(e) => { e.currentTarget.style.borderColor = '#333'; e.currentTarget.style.backgroundColor = '#1E1E1E'; }}
+            >
+              <i className={`fas ${item.icon}`}></i> {item.label}
+            </button>
+          ))}
+        </div>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '40px' }}>
-        {/* Griglia Categorie */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '25px' }}>
+      {/* SEZIONE CONSIGLIATI: Card grandi con Scorrimento Verticale Interno */}
+      <section style={{ marginBottom: '60px' }}>
+        <h2 style={{ color: 'white', margin: '0 0 25px 0', fontSize: '1.5rem' }}>Consigliati per te</h2>
+        
+        {/* BOX SCORREVOLE */}
+        <div style={{ 
+          maxHeight: '500px', 
+          overflowY: 'auto',  
+          paddingRight: '15px', 
+          paddingBottom: '10px'
+        }}>
+          {/* GRIGLIA FLUIDA DELLE CARD GRANDI */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+            gap: '20px' 
+          }}>
+            {events.map(event => {
+              const path = event.entityType === 'Sleep' ? `/SleepAccommodationDetail/${event.id}` : `/${event.entityType}Detail/${event.id}`;
+              return (
+                <Link 
+                  to={path} 
+                  key={event.id} 
+                  style={{ 
+                    textDecoration: 'none', 
+                    backgroundColor: '#1E1E1E', 
+                    borderRadius: '16px', 
+                    border: '1px solid #333',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'border-color 0.2s ease, transform 0.2s ease'
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.borderColor = '#4DA8DA'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.borderColor = '#333'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <img 
+                    src={event.imagePath ? `${MEDIA_BASE_URL}${event.imagePath}` : "https://via.placeholder.com/300x150"} 
+                    style={{ width: '100%', height: '160px', objectFit: 'cover', borderBottom: '1px solid #333' }} 
+                    alt={event.title} 
+                  />
+                  <div style={{ padding: '20px' }}>
+                    <h4 style={{ color: 'white', margin: '0 0 10px 0', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{event.title}</h4>
+                    {event.distanceInKm && (
+                      <span style={{ color: '#4DA8DA', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <i className="fas fa-map-marker-alt"></i> {event.distanceInKm.toFixed(1)} km
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* SEZIONE CATEGORIE: Stile "Tile / Bento Box" */}
+      <section>
+        <h2 style={{ color: 'white', margin: '0 0 25px 0', fontSize: '1.5rem' }}>Esplora per Categoria</h2>
+        
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
+          gap: '20px' 
+        }}>
           {categories.map((cat, i) => (
-            <Link to={cat.path} key={i} style={{ textDecoration: 'none', backgroundColor: '#1E1E1E', borderRadius: '12px', padding: '25px', color: 'white', border: '1px solid #333' }}>
-              <i className={`fas ${cat.icon}`} style={{ color: '#4DA8DA', fontSize: '1.5rem', marginBottom: '10px' }}></i>
-              <h3>{cat.title}</h3>
-              <p style={{ color: '#aaa', fontSize: '0.8rem' }}>{cat.desc}</p>
+            <Link 
+              to={cat.path} 
+              key={i} 
+              style={{ 
+                textDecoration: 'none', 
+                backgroundColor: '#1E1E1E', 
+                borderRadius: '16px', 
+                padding: '24px', 
+                color: 'white', 
+                border: '1px solid #333',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                minHeight: '140px', 
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => { 
+                e.currentTarget.style.borderColor = '#4DA8DA'; 
+                e.currentTarget.style.transform = 'translateY(-5px)'; 
+                e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)'; 
+              }}
+              onMouseOut={(e) => { 
+                e.currentTarget.style.borderColor = '#333'; 
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <i className={`fas ${cat.icon}`} style={{ color: '#4DA8DA', fontSize: '2.2rem', marginBottom: '20px' }}></i>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: '600' }}>{cat.title}</h3>
+                <p style={{ color: '#aaa', fontSize: '0.85rem', margin: '8px 0 0 0', lineHeight: '1.3' }}>{cat.desc}</p>
+              </div>
             </Link>
           ))}
         </div>
+      </section>
 
-        {/* Sidebar Consigliati */}
-        <aside style={{ backgroundColor: '#1E1E1E', borderRadius: '12px', padding: '18px', position: 'sticky', top: '40px', border: '1px solid #333' }}>
-          <h3 style={{ color: 'white', marginBottom: '15px' }}>Consigliati</h3>
-          
-          <div ref={scrollContainerRef} onScroll={handleScroll} style={{ maxHeight: 'calc(100vh - 250px)', overflowY: 'auto' }}>
-          {displayedEvents.map(event => {
-            const path = event.entityType === 'Sleep' 
-              ? `/SleepAccommodationDetail/${event.id}` 
-              : `/${event.entityType}Detail/${event.id}`;
-
-            return (
-              <Link 
-                to={path} 
-                key={event.id} 
-                style={{ textDecoration: 'none', display: 'flex', gap: '10px', marginBottom: '15px', padding: '10px', backgroundColor: '#252525', borderRadius: '8px', border: '1px solid #333' }}
-              >
-                <img 
-                  src={event.imagePath ? `${MEDIA_BASE_URL}${event.imagePath}` : "https://via.placeholder.com/60"} 
-                  style={{ width: '60px', height: '60px', borderRadius: '4px', objectFit: 'cover' }} 
-                  alt={event.title} 
-                />
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <h4 style={{ color: 'white', margin: 0, fontSize: '0.9rem' }}>{event.title}</h4>
-                  {event.distanceInKm && <span style={{ color: '#81C784', fontSize: '0.8rem' }}>{event.distanceInKm.toFixed(1)} km</span>}
-                </div>
-              </Link>
-            );
-          })}
-          </div>
-
-          <div style={{ color: 'white', fontSize: '0.7rem', marginTop: '10px' }}>
-            Visualizzati: {displayedEvents.length} di {allFilteredEvents.length}
-          </div>
-
-          {displayedEvents.length < allFilteredEvents.length && (
-            <button 
-              onClick={loadMoreItems}
-              style={{ width: '100%', padding: '10px', marginTop: '10px', backgroundColor: '#4DA8DA', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'white', fontWeight: 'bold' }}
-            >
-              Mostra Altri
-            </button>
-          )}
-        </aside>
-      </div>
     </div>
   );
 }
-
+aaa
 export default Home;
